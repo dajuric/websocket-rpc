@@ -1,0 +1,42 @@
+﻿<html>
+    <head>
+        <script src="LocalAPI.js"></script>
+    </head>
+
+    <body>
+        <p id="msg"></p>
+
+        <p id="progress"></p>
+        <p id="result"></p>
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            //init API
+            var api = new LocalAPI("ws://localhost:8001");
+
+            //implement the interface
+            api.writeProgress = function (p)
+            {
+                document.getElementById("progress").innerHTML = "Completed: " + p * 100 + "%";
+                return true;
+            }
+			
+            async function execAPI(api)
+            {			
+                var r = await api.longRunningTask(5, 3);
+                document.getElementById("result").innerHTML = "Result: " + JSON.stringify(r, null, "\t");
+            }
+
+            api.connect(() => execAPI(api), err => writeMsg(err, 'red'), msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>

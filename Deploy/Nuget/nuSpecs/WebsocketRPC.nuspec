@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>WebsocketRPC</id>
+    <version>$version$</version>
+    <title>WebsocketRPC</title>
+    <authors>Darko Jurić</authors>
+    <owners>Darko Jurić</owners>
+    <!--<iconUrl></iconUrl>-->
+    <description>
+     Provides full duplex RPC over websocket.
+    </description>
+    <summary>Provides full duplex RPC over websocket.</summary>
+    <tags>websocket; RPC; C#; .NET</tags>
+
+    <dependencies>      
+      <dependency id="Newtonsoft.Json" version="10.0.3" />
+    </dependencies>
+
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Net.Http" />
+    </frameworkAssemblies>
+  </metadata>
+
+  <files>
+    <file src="..\..\..\Source\WebsocketRPC\bin\WebsocketRPC.dll" target="lib\net47\WebsocketRPC.dll" />
+    <file src="..\..\..\Source\WebsocketRPC\bin\WebsocketRPC.xml" target="lib\net47\WebsocketRPC.xml" />
+  </files>
+</package>

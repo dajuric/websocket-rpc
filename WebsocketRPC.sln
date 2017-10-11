@@ -1,0 +1,138 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{3CE373E0-6D9A-48C4-808D-510E6FB69D5C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\README.md = Samples\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsocketRPC", "Source\WebsocketRPC\WebsocketRPC.csproj", "{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.JS", "Source\WebSocketRPC.JS\WebSocketRPC.JS.csproj", "{965791BF-8F77-4A69-97E2-8B6B66CF9863}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServerClientSample", "ServerClientSample", "{E4A64C0A-0127-42AD-A439-2063A145F536}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\ServerClientSample\Run.bat = Samples\ServerClientSample\Run.bat
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerClientJs", "Samples\ClientJs\ServerClientJs.csproj", "{C0449FA5-C667-4B5C-878A-04773903B130}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Samples\ServerClientSample\Client\Client.csproj", "{E0DBB446-3B2B-4BC2-871F-925AB60917E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Samples\ServerClientSample\Server\Server.csproj", "{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{26CCD24E-8415-4FD5-8AB3-17433A265B08}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiService", "Samples\MultiService\MultiService.csproj", "{2B69F62E-991C-4E4B-B1FF-2A5906415764}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RelayConnectionSample", "RelayConnectionSample", "{2D53E72C-CA18-43B0-8B22-628401177763}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\RelayConnectionSample\Run.bat = Samples\RelayConnectionSample\Run.bat
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrontendService", "Samples\RelayConnectionSample\FrontendService\FrontendService.csproj", "{79BCCE0B-3666-4866-AF36-8FA2C71479C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundService", "Samples\RelayConnectionSample\BackgroundService\BackgroundService.csproj", "{4616F442-466A-4B0E-8939-DA6367A5E365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization", "Samples\Serialization\Serialization.csproj", "{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6B3680DB-211E-492C-BC67-46FF1F00A730}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{B998D2DB-7CA7-4A1B-8B98-801973A12D20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logo", "Logo", "{6E575BA8-2787-4A5D-9742-8ACBA07C93D9}"
+	ProjectSection(SolutionItems) = preProject
+		Deploy\Logo\Logo-big.png = Deploy\Logo\Logo-big.png
+		Deploy\Logo\Logo-small.png = Deploy\Logo\Logo-small.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE}"
+	ProjectSection(SolutionItems) = preProject
+		Deploy\Nuget\Build.cmd = Deploy\Nuget\Build.cmd
+		Deploy\Nuget\Push.cmd = Deploy\Nuget\Push.cmd
+		Deploy\Nuget\UpdateNuGet.cmd = Deploy\Nuget\UpdateNuGet.cmd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuSpecs", "nuSpecs", "{07BE9233-A701-4899-8FB0-21D8EE0057D3}"
+	ProjectSection(SolutionItems) = preProject
+		Deploy\Nuget\nuSpecs\WebsocketRPC.JS.nuspec = Deploy\Nuget\nuSpecs\WebsocketRPC.JS.nuspec
+		Deploy\Nuget\nuSpecs\WebsocketRPC.nuspec = Deploy\Nuget\nuSpecs\WebsocketRPC.nuspec
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{965791BF-8F77-4A69-97E2-8B6B66CF9863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{965791BF-8F77-4A69-97E2-8B6B66CF9863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{965791BF-8F77-4A69-97E2-8B6B66CF9863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{965791BF-8F77-4A69-97E2-8B6B66CF9863}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0449FA5-C667-4B5C-878A-04773903B130}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0449FA5-C667-4B5C-878A-04773903B130}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0449FA5-C667-4B5C-878A-04773903B130}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0449FA5-C667-4B5C-878A-04773903B130}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0DBB446-3B2B-4BC2-871F-925AB60917E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0DBB446-3B2B-4BC2-871F-925AB60917E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0DBB446-3B2B-4BC2-871F-925AB60917E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0DBB446-3B2B-4BC2-871F-925AB60917E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B69F62E-991C-4E4B-B1FF-2A5906415764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B69F62E-991C-4E4B-B1FF-2A5906415764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B69F62E-991C-4E4B-B1FF-2A5906415764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B69F62E-991C-4E4B-B1FF-2A5906415764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79BCCE0B-3666-4866-AF36-8FA2C71479C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79BCCE0B-3666-4866-AF36-8FA2C71479C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79BCCE0B-3666-4866-AF36-8FA2C71479C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79BCCE0B-3666-4866-AF36-8FA2C71479C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4616F442-466A-4B0E-8939-DA6367A5E365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4616F442-466A-4B0E-8939-DA6367A5E365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4616F442-466A-4B0E-8939-DA6367A5E365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4616F442-466A-4B0E-8939-DA6367A5E365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E} = {3CE373E0-6D9A-48C4-808D-510E6FB69D5C}
+		{965791BF-8F77-4A69-97E2-8B6B66CF9863} = {3CE373E0-6D9A-48C4-808D-510E6FB69D5C}
+		{E4A64C0A-0127-42AD-A439-2063A145F536} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{C0449FA5-C667-4B5C-878A-04773903B130} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{E0DBB446-3B2B-4BC2-871F-925AB60917E3} = {E4A64C0A-0127-42AD-A439-2063A145F536}
+		{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B} = {E4A64C0A-0127-42AD-A439-2063A145F536}
+		{2B69F62E-991C-4E4B-B1FF-2A5906415764} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{2D53E72C-CA18-43B0-8B22-628401177763} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{79BCCE0B-3666-4866-AF36-8FA2C71479C0} = {2D53E72C-CA18-43B0-8B22-628401177763}
+		{4616F442-466A-4B0E-8939-DA6367A5E365} = {2D53E72C-CA18-43B0-8B22-628401177763}
+		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{6E575BA8-2787-4A5D-9742-8ACBA07C93D9} = {B998D2DB-7CA7-4A1B-8B98-801973A12D20}
+		{CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE} = {B998D2DB-7CA7-4A1B-8B98-801973A12D20}
+		{07BE9233-A701-4899-8FB0-21D8EE0057D3} = {CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {591A6475-8DF2-42DA-AFF1-8EF88BCF6EE4}
+	EndGlobalSection
+EndGlobal

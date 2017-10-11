@@ -1,0 +1,35 @@
+﻿<html>
+    <head>
+        <script src="IBackgroundService.js"></script>
+    </head>
+
+    <body>
+        <p id="msg"></p>
+
+        <p id="progress"></p>
+        <p id="result"></p>
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            //init API
+            var bckgService = new IBackgroundService("ws://localhost:8001");
+
+            async function execAPI(api)
+            {			
+                var r = await api.concatString("Hello ", "world");
+                document.getElementById("result").innerHTML = "Result: " + JSON.stringify(r, null, "\t");
+            }
+
+            bckgService.connect(() => execAPI(bckgService), err => writeMsg(err, 'red'), msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>

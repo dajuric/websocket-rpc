@@ -1,0 +1,44 @@
+﻿<html>
+    <head>
+        <script src="NumericService.js"></script>
+        <script src="TextService.js"></script>
+    </head>
+
+    <body>
+        <p id="msg"></p>
+        <p id="resultNum"></p>
+        <p id="resultTxt"></p>
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            //init API
+            var baseUri = "ws://localhost:8001/"
+            var numService = new NumericService(baseUri + "numericService");
+            var txtService = new TextService(baseUri + "textService");
+			
+            async function execNumeric(api)
+            {			
+                var rNum = await numService.add(5, 3);
+                document.getElementById("resultNum").innerHTML = "Result: " + JSON.stringify(rNum, null, "\t");
+            }
+
+            async function execText(api)
+            {
+                var rTxt = await txtService.add("Hello ", "world");
+                document.getElementById("resultTxt").innerHTML = "Result: " + JSON.stringify(rTxt, null, "\t");
+            }
+
+            numService.connect(() => execNumeric(numService), err => writeMsg(err, 'red'), msg => writeMsg(msg));
+            txtService.connect(() => execText(txtService),    err => writeMsg(err, 'red'), msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>

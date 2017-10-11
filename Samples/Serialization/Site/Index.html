@@ -1,0 +1,38 @@
+﻿<html>
+    <head>
+        <script src="ImageProcessingAPI.js"></script>
+    </head>
+
+    <body>
+        <p id="msg"></p>
+
+        <p id="progress"></p>
+        <img id="result" src="" />
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            //init API
+            var api = new ImageProcessingAPI("ws://localhost:8001");
+			
+            async function execAPI(api)
+            {			
+                var base64Jpg = null;
+                try { base64Jpg = await api.swapImageChannels("http://www.hare-hill.co.uk/pics/bunnies/previous%20bunnies/Honey%20bunny.jpg", [1, 0, 2]); }
+                catch (e) { writeMsg(e, 'red'); }
+
+                document.getElementById("result").src = "data:image/jpg;base64," + base64Jpg;
+            }
+
+            api.connect(() => execAPI(api), err => writeMsg(err, 'red'), msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>
