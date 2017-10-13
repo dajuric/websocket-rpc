@@ -148,17 +148,5 @@ namespace WebsocketRPC
             var str = data.ToString(Encoding.ASCII);
             return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
         }
-
-        /// <summary>
-        /// Relays the incoming data for binders associated with the interface to the specified target connection.
-        /// <para>The number of such binders must be equal to one, due 1:1 mapping.</para>
-        /// </summary>
-        /// <typeparam name="TInterface">Interface tpe.</typeparam>
-        /// <param name="connection">Target connection.</param>
-        /// <returns>Binder.</returns>
-        public static IBinder Relay<TInterface>(this Connection connection)
-        {
-            return new RelayBinder<TInterface>(connection, () => AllBinders.OfType<IRemoteBinder<TInterface>>());
-        }
     }
 }

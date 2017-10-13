@@ -33,7 +33,7 @@ There is only one relevant method: **Bind** for binding object/interface onto co
  
 ## Sample
 
-To scratch the surface... *(RPC in both directions, connection relaying, multi-service, .NET clients)*
+To scratch the surface... *(RPC in both directions, multi-service, .NET clients)*
 
 **Server**
  ``` csharp

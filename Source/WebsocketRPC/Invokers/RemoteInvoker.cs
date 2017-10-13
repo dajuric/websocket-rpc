@@ -85,9 +85,6 @@ namespace WebsocketRPC
 
         public async Task<TResult> InvokeAsync<TResult>(Expression<Func<TInterface, TResult>> functionExpression)
         {
-            if (sendAsync == null)
-                throw new Exception("The invoker is not initialized.");
-
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var r = await invokeAsync<TResult>(funcName, argVals);
             return r.Result;
@@ -95,6 +92,9 @@ namespace WebsocketRPC
 
         async Task<(TResult Result, Exception Error)> invokeAsync<TResult>(string name, params object[] args)
         {
+            if (sendAsync == null)
+                throw new Exception("The invoker is not initialized.");
+
             var msg = new Request
             {
                 FunctionName = name,

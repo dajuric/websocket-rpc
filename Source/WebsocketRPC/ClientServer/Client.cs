@@ -42,10 +42,37 @@ namespace WebsocketRPC
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnection">Action executed when connection is established.</param>
         /// <param name="setOptions">Websocket option set method.</param>
+        /// <param name="reconnectOnError">True to reconnect on error, false otherwise.</param>
+        /// <param name="secondsBetweenReconnect">The number of seconds between two reconnect attempts.</param>
         /// <returns>Client task.</returns>
-        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null)
+        /// <exception cref="Exception">Socket connection exception thrown in case when <paramref name="secondsBetweenReconnect"/> is set to false.</exception>
+        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null, 
+                                              bool reconnectOnError = true, int secondsBetweenReconnect = 0)
+        {
+            var isClosedSuccessfully = true;
+
+            do
+            {
+                try
+                {
+                    isClosedSuccessfully = await connectAsync(uri, token, onConnection, setOptions);
+                }
+                catch (Exception ex)
+                {
+                    isClosedSuccessfully = false;
+                    if (!reconnectOnError) throw ex;
+                }
+
+                if (!isClosedSuccessfully && reconnectOnError)
+                    await Task.Delay(TimeSpan.FromSeconds(secondsBetweenReconnect));
+            }
+            while (!isClosedSuccessfully && reconnectOnError);
+        }
+
+        static async Task<bool> connectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null)
         {
             ClientWebSocket webSocket = null;
+            var isClosedSuccessfully = true;
 
             try
             {
@@ -68,8 +95,11 @@ namespace WebsocketRPC
             }
             finally
             {
+                isClosedSuccessfully = webSocket.State != WebSocketState.Aborted;
                 webSocket?.Dispose();
             }
+
+            return isClosedSuccessfully;
         }
     }
 }

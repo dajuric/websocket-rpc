@@ -178,6 +178,7 @@ namespace WebsocketRPC
                 {
                     while (ex.InnerException != null) ex = ex.InnerException;
                     connection.OnError?.Invoke(ex);
+                    //socket will be aborted -> no need to close manually
                 }
             }
         }

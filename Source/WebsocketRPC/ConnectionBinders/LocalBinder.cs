@@ -23,6 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System;
 using static WebsocketRPC.RPCSettings;
 
 namespace WebsocketRPC
@@ -47,6 +48,11 @@ namespace WebsocketRPC
 
                 var result = await lInvoker.InvokeAsync(Object, msg);
                 await Connection.SendAsync(result.ToJson(), Encoding);
+            };
+
+            Connection.OnClose += () =>
+            {
+                (Object as IDisposable)?.Dispose();
             };
         }
 

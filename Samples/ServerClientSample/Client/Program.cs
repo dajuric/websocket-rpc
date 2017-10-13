@@ -42,7 +42,7 @@ namespace TestClient
             })
             .Wait(0);
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(TestClient));
+            Console.Write("Running: '{0}'. Press [Enter] to exit.\n", nameof(TestClient));
             Console.ReadLine();
             cts.Cancel();
         }

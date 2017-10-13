@@ -46,7 +46,6 @@
     <Compile Include="ClientServer\Connection.cs" />
     <Compile Include="ClientServer\Helper.cs" />
     <Compile Include="ClientServer\Server.cs" />
-    <Compile Include="ConnectionBinders\RelayBinder.cs" />
     <Compile Include="Invokers\LocalInvoker.cs" />
     <Compile Include="Invokers\Messages.cs" />
     <Compile Include="Invokers\RemoteInvoker.cs" />

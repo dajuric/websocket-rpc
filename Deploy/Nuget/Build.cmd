@@ -3,8 +3,8 @@
 :: timeout /T 5
 
 :: settings
-set nugetPath=%cd%\..\.nuget
-set version=0.5.0
+set nugetPath=%cd%\..\..\.nuget
+set version=0.5.1
 set output=%cd%\bin
 
 :: Create output directory
