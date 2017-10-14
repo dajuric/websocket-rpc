@@ -122,7 +122,7 @@ namespace WebsocketRPC
             if (Socket.State != WebSocketState.Open)
                 return;
 
-            await Socket.CloseAsync(closeStatus, statusDescription, CancellationToken.None);
+            await Socket.CloseOutputAsync(closeStatus, statusDescription, CancellationToken.None);
             OnClose?.Invoke();
             clearEvents();
         }
@@ -140,6 +140,7 @@ namespace WebsocketRPC
             {
                 try
                 {
+                    connection.OnOpen?.Invoke();
                     byte[] receiveBuffer = new byte[RPCSettings.MaxMessageSize];
 
                     while (webSocket.State == WebSocketState.Open)
@@ -182,14 +183,6 @@ namespace WebsocketRPC
                     //socket will be aborted -> no need to close manually
                 }
             }
-        }
-
-        /// <summary>
-        /// Invokes the open event.
-        /// </summary>
-        internal void InvokeOpenAsync()
-        {
-            OnOpen?.Invoke();
         }
 
         /// <summary>

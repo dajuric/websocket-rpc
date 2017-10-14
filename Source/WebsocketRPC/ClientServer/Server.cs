@@ -101,13 +101,11 @@ namespace WebsocketRPC
             try
             {
                 onConnection(connection, webSocketContext);
-                connection.InvokeOpenAsync();
                 await Connection.ListenReceiveAsync(connection, token);
             }
             finally
             {
-                if (webSocket != null)
-                    webSocket.Dispose();
+                //webSocket?.Dispose();
             }
         }
     }

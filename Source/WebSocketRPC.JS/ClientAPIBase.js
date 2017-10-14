@@ -41,6 +41,7 @@ function onCallRequest(data, onError)
     }
 
     var r = obj[jsonFName].apply(obj, data.Arguments);
+    if (r === undefined) r = true;
     ws.send(JSON.stringify({ FunctionName: data.FunctionName, ReturnValue: r }));
 }
 

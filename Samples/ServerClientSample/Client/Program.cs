@@ -15,7 +15,7 @@ namespace TestClient
     {
         public void WriteProgress(float progress)
         {
-            Console.WriteLine("\rCompleted: {0}%.", progress * 100);
+            Console.Write("\rCompleted: {0}%.", progress * 100);
         }
     }
 
@@ -37,7 +37,7 @@ namespace TestClient
                 c.OnOpen += async () =>
                 {
                     var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
-                    Console.WriteLine("Result: " + r.First());
+                    Console.WriteLine("\nResult: " + r.First());
                 };
             })
             .Wait(0);

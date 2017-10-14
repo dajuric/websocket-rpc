@@ -7,7 +7,6 @@ The recommendation is to run samples in the following order (from the more simpl
 2. ServerClientJs
 3. MultiService
 4. Serialization
-5. RelayConnectionSample
 
 **Remarks**  
 + If a sample contains JavaScript client, the additional step is to open the included Index.html.

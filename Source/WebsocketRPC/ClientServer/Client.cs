@@ -43,13 +43,15 @@ namespace WebsocketRPC
         /// <param name="onConnection">Action executed when connection is established.</param>
         /// <param name="setOptions">Websocket option set method.</param>
         /// <param name="reconnectOnError">True to reconnect on error, false otherwise.</param>
+        /// <param name="reconnectOnClose">True to reconnect on normal close request, false otherwise.</param>
         /// <param name="secondsBetweenReconnect">The number of seconds between two reconnect attempts.</param>
         /// <returns>Client task.</returns>
-        /// <exception cref="Exception">Socket connection exception thrown in case when <paramref name="secondsBetweenReconnect"/> is set to false.</exception>
+        /// <exception cref="Exception">Socket connection exception thrown in case when <paramref name="reconnectOnError"/> and <paramref name="reconnectOnClose"/> is set to false.</exception>
         public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null, 
-                                              bool reconnectOnError = true, int secondsBetweenReconnect = 0)
+                                              bool reconnectOnError = true, bool reconnectOnClose = false, int secondsBetweenReconnect = 0)
         {
             var isClosedSuccessfully = true;
+            var shouldReconnect = false;
 
             do
             {
@@ -60,13 +62,17 @@ namespace WebsocketRPC
                 catch (Exception ex)
                 {
                     isClosedSuccessfully = false;
-                    if (!reconnectOnError) throw ex;
+                    if (!reconnectOnError && !reconnectOnClose) throw ex;
                 }
 
-                if (!isClosedSuccessfully && reconnectOnError)
+                if (token.IsCancellationRequested)
+                    break;
+
+                shouldReconnect = (!isClosedSuccessfully && reconnectOnError) || reconnectOnClose;
+                if (shouldReconnect)
                     await Task.Delay(TimeSpan.FromSeconds(secondsBetweenReconnect));
             }
-            while (!isClosedSuccessfully && reconnectOnError);
+            while (shouldReconnect);
         }
 
         static async Task<bool> connectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null)
@@ -90,7 +96,6 @@ namespace WebsocketRPC
             try
             {
                 onConnection(connection);
-                connection.InvokeOpenAsync();
                 await Connection.ListenReceiveAsync(connection, token);
             }
             finally
