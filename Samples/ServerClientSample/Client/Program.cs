@@ -37,7 +37,7 @@ namespace TestClient
                 c.OnOpen += async () =>
                 {
                     var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
-                    Console.WriteLine("Result: " + r.First().Result);
+                    Console.WriteLine("Result: " + r.First());
                 };
             })
             .Wait(0);

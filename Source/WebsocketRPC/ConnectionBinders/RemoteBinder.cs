@@ -68,12 +68,12 @@ namespace WebsocketRPC
             return await rInvoker.InvokeAsync(functionExpression);
         }
 
-        public async Task<Task> CallAsync(Expression<Func<TInterface, Task>> functionExpression)
+        public async Task CallAsync(Expression<Func<TInterface, Task>> functionExpression)
         {
-            return await rInvoker.InvokeAsync(functionExpression);
+            await rInvoker.InvokeAsync(functionExpression);
         }
 
-        public async Task<Task<TResult>> CallAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
+        public async Task<TResult> CallAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
         {
             return await rInvoker.InvokeAsync(functionExpression);
         }

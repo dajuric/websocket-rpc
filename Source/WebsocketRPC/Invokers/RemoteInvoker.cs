@@ -105,18 +105,16 @@ namespace WebsocketRPC
             return result;
         }
 
-        public async Task<Task> InvokeAsync(Expression<Func<TInterface, Task>> functionExpression)
+        public async Task InvokeAsync(Expression<Func<TInterface, Task>> functionExpression)
         {
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
 
             if (response.Error != null)
                 throw new Exception(response.Error);
-
-            return Task.FromResult(true);
         }
 
-        public async Task<Task<TResult>> InvokeAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
+        public async Task<TResult> InvokeAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
         {
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
@@ -125,7 +123,7 @@ namespace WebsocketRPC
             if (response.Error != null)
                 throw new Exception(response.Error);
 
-            return Task.FromResult(result);
+            return result;
         }
 
         async Task<Response> invokeAsync(string name, params object[] args)

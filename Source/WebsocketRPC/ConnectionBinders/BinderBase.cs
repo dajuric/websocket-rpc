@@ -80,7 +80,7 @@ namespace WebsocketRPC
         /// </summary>
         /// <param name="functionExpression">Method getter.</param>
         /// <returns>RPC task result.</returns>
-        Task<Task> CallAsync(Expression<Func<T, Task>> functionExpression);
+        Task CallAsync(Expression<Func<T, Task>> functionExpression);
 
         /// <summary>
         /// Calls the RPC method.
@@ -88,7 +88,7 @@ namespace WebsocketRPC
         /// <typeparam name="TResult">Result.</typeparam>
         /// <param name="functionExpression">Method getter.</param>
         /// <returns>RPC result.</returns>
-        Task<Task<TResult>> CallAsync<TResult>(Expression<Func<T, Task<TResult>>> functionExpression);
+        Task<TResult> CallAsync<TResult>(Expression<Func<T, Task<TResult>>> functionExpression);
     }
 
     /// <summary>

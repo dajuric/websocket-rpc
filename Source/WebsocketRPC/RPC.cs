@@ -196,9 +196,9 @@ namespace WebsocketRPC
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
         /// <returns>The collection of results.</returns>
-        public static async Task<Task<TResult>[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task<TResult>>> functionExpression)
+        public static async Task<TResult[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task<TResult>>> functionExpression)
         {
-            var tasks = new List<Task<Task<TResult>>>();
+            var tasks = new List<Task<TResult>>();
             foreach (var b in binders)
             {
                 var t = b.CallAsync(functionExpression);
