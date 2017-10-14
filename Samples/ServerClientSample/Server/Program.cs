@@ -7,7 +7,7 @@ namespace TestServer
 {
     interface IRemoteAPI
     {
-        bool WriteProgress(float progress);
+        void WriteProgress(float progress);
     }
 
     class LocalAPI

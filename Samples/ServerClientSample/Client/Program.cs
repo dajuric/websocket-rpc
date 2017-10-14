@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using WebsocketRPC;
 
 namespace TestClient
 {
     public interface ILocalAPI
     {
-        int LongRunningTask(int a, int b);
+        Task<int> LongRunningTask(int a, int b);
     }
 
     public class RemoteAPI //:IRemoteAPI
     {
-        public bool WriteProgress(float progress)
+        public void WriteProgress(float progress)
         {
             Console.WriteLine("\rCompleted: {0}%.", progress * 100);
-            return true;
         }
     }
 
@@ -37,7 +37,7 @@ namespace TestClient
                 c.OnOpen += async () =>
                 {
                     var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
-                    Console.WriteLine("Result: " + r.First());
+                    Console.WriteLine("Result: " + r.First().Result);
                 };
             })
             .Wait(0);

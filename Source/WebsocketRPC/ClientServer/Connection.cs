@@ -140,7 +140,7 @@ namespace WebsocketRPC
             {
                 try
                 {
-                    byte[] receiveBuffer = new byte[1024];
+                    byte[] receiveBuffer = new byte[RPCSettings.MaxMessageSize];
 
                     while (webSocket.State == WebSocketState.Open)
                     {
@@ -178,6 +178,7 @@ namespace WebsocketRPC
                 {
                     while (ex.InnerException != null) ex = ex.InnerException;
                     connection.OnError?.Invoke(ex);
+                    connection.OnClose?.Invoke();
                     //socket will be aborted -> no need to close manually
                 }
             }

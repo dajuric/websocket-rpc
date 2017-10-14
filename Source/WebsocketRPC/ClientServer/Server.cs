@@ -31,17 +31,6 @@ using System.Threading.Tasks;
 
 namespace WebsocketRPC
 {
-    //sample:
-    /*Server.ListenAsync("http://+:8001/", CancellationToken.None, c =>
-          {
-              c.OnOpenAsync = () => Task.Run(() => Console.WriteLine("Connection opened."));
-              c.OnErrorAsync = e => Task.Run(() => Console.WriteLine("Error: " + e.Message));
-              c.OnCloseAsync = () => Task.Run(() => Console.WriteLine("Connection closed."));
-
-              c.OnReceiveAsync = (s, d) => Task.Run(() => Console.WriteLine("Received: " + d.AsString(Encoding.UTF8)));
-          })
-          .Wait();*/
-
     /// <summary>
     /// Websocket server.
     /// </summary>

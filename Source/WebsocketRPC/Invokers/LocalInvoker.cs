@@ -95,8 +95,21 @@ namespace WebsocketRPC
 
             try
             {
-                var returnVal = await invokeAsync(methods[functionName], obj, argObjs);
-                var result = (returnVal != null) ? JToken.FromObject(returnVal, RPCSettings.Serializer) : null;
+                var hasResult = methods[functionName].ReturnType != typeof(void) &&
+                                methods[functionName].ReturnType != typeof(Task);
+
+                JToken result = null;
+                if (hasResult)
+                {
+                    var returnVal = await invokeWithResultAsync(methods[functionName], obj, argObjs);
+                    result = (returnVal != null) ? JToken.FromObject(returnVal, RPCSettings.Serializer) : null;
+                }
+                else
+                {
+                    await invokeAsync(methods[functionName], obj, argObjs);
+                    result = JToken.FromObject(true);
+                }
+
                 return (result, null);
             }
             catch (Exception ex)
@@ -106,7 +119,19 @@ namespace WebsocketRPC
             }
         }
 
-        async Task<object> invokeAsync(MethodInfo method, TObj obj, object[] args)
+        async Task invokeAsync(MethodInfo method, TObj obj, object[] args)
+        {
+            object returnVal = method.Invoke(obj, args);
+
+            //async method support
+            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+            {
+                var task = (Task)returnVal;
+                await task.ConfigureAwait(false);
+            }
+        }
+
+        async Task<object> invokeWithResultAsync(MethodInfo method, TObj obj, object[] args)
         {
             object returnVal = method.Invoke(obj, args);
 
@@ -122,5 +147,7 @@ namespace WebsocketRPC
 
             return returnVal;
         }
+
+
     }
 }

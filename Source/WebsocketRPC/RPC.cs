@@ -79,7 +79,7 @@ namespace WebsocketRPC
         }
 
         /// <summary>
-        /// Gets all two-way or one-way sending binders.
+        /// Gets all two-way or one-way remote binders.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <returns>Binders.</returns>
@@ -114,13 +114,44 @@ namespace WebsocketRPC
         }
 
         /// <summary>
+        /// Gets whether the data contain RPC message or not.
+        /// </summary>
+        /// <param name="data">Received data.</param>
+        /// <returns>True if the data contain RPC message, false otherwise.</returns>
+        public static bool IsRPC(this ArraySegment<byte> data)
+        {
+            var str = data.ToString(Encoding.ASCII);
+            return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
+        }
+
+
+        /// <summary>
+        /// Calls the remote method.
+        /// </summary>
+        /// <typeparam name="TInterface">Interface type.</typeparam>
+        /// <param name="binders">Remote binder collection.</param>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>The RPC task.</returns>
+        public static async Task CallAsync<TInterface>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Action<TInterface>> functionExpression)
+        {
+            var tasks = new List<Task>();
+            foreach (var b in binders)
+            {
+                var t = b.CallAsync(functionExpression);
+                tasks.Add(t);
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
         /// Calls the remote method.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <typeparam name="TResult">Method result type.</typeparam>
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
-        /// <returns>The collection of the RPC invoking tasks.</returns>
+        /// <returns>The collection of results.</returns>
         public static async Task<TResult[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, TResult>> functionExpression)
         {
             var tasks = new List<Task<TResult>>();
@@ -139,14 +170,47 @@ namespace WebsocketRPC
         }
 
         /// <summary>
-        /// Gets whether the data contain RPC message or not.
+        /// Calls the remote method.
         /// </summary>
-        /// <param name="data">Received data.</param>
-        /// <returns>True if the data contain RPC message, false otherwise.</returns>
-        public static bool IsRPC(this ArraySegment<byte> data)
+        /// <typeparam name="TInterface">Interface type.</typeparam>
+        /// <param name="binders">Remote binder collection.</param>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>The RPC task.</returns>
+        public static async Task CallAsync<TInterface>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task>> functionExpression)
         {
-            var str = data.ToString(Encoding.ASCII);
-            return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
+            var tasks = new List<Task>();
+            foreach (var b in binders)
+            {
+                var t = b.CallAsync(functionExpression);
+                tasks.Add(t);
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Calls the remote method.
+        /// </summary>
+        /// <typeparam name="TInterface">Interface type.</typeparam>
+        /// <typeparam name="TResult">Method result type.</typeparam>
+        /// <param name="binders">Remote binder collection.</param>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>The collection of results.</returns>
+        public static async Task<Task<TResult>[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task<TResult>>> functionExpression)
+        {
+            var tasks = new List<Task<Task<TResult>>>();
+            foreach (var b in binders)
+            {
+                var t = b.CallAsync(functionExpression);
+                tasks.Add(t);
+            }
+
+            await Task.WhenAll(tasks);
+            var results = tasks.Where(x => x.Status == TaskStatus.RanToCompletion)
+                               .Select(x => x.Result)
+                               .ToArray();
+
+            return results;
         }
     }
 }

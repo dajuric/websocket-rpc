@@ -83,14 +83,52 @@ namespace WebsocketRPC
             runningMethods[response.FunctionName].SetResult(response);
         }
 
+
+        public async Task InvokeAsync(Expression<Action<TInterface>> functionExpression)
+        {
+            var (funcName, argVals) = getFunctionInfo(functionExpression);
+            var response = await invokeAsync(funcName, argVals);
+
+            if (response.Error != null)
+                throw new Exception(response.Error);
+        }
+
         public async Task<TResult> InvokeAsync<TResult>(Expression<Func<TInterface, TResult>> functionExpression)
         {
             var (funcName, argVals) = getFunctionInfo(functionExpression);
-            var r = await invokeAsync<TResult>(funcName, argVals);
-            return r.Result;
+            var response = await invokeAsync(funcName, argVals);
+
+            var result = response.ReturnValue.ToObject<TResult>(RPCSettings.Serializer);
+            if (response.Error != null)
+                throw new Exception(response.Error);
+
+            return result;
         }
 
-        async Task<(TResult Result, Exception Error)> invokeAsync<TResult>(string name, params object[] args)
+        public async Task<Task> InvokeAsync(Expression<Func<TInterface, Task>> functionExpression)
+        {
+            var (funcName, argVals) = getFunctionInfo(functionExpression);
+            var response = await invokeAsync(funcName, argVals);
+
+            if (response.Error != null)
+                throw new Exception(response.Error);
+
+            return Task.FromResult(true);
+        }
+
+        public async Task<Task<TResult>> InvokeAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
+        {
+            var (funcName, argVals) = getFunctionInfo(functionExpression);
+            var response = await invokeAsync(funcName, argVals);
+
+            var result = response.ReturnValue.ToObject<TResult>(RPCSettings.Serializer);
+            if (response.Error != null)
+                throw new Exception(response.Error);
+
+            return Task.FromResult(result);
+        }
+
+        async Task<Response> invokeAsync(string name, params object[] args)
         {
             if (sendAsync == null)
                 throw new Exception("The invoker is not initialized.");
@@ -108,10 +146,7 @@ namespace WebsocketRPC
             var response = runningMethods[name].Task.Result;
             runningMethods.Remove(name);
 
-            var result = response.ReturnValue.ToObject<TResult>(RPCSettings.Serializer);
-            var ex = response.Error;
-
-            return (result, (ex != null) ? new Exception(ex) : null);
+            return response;
         }
 
         //the idea is taken from: https://stackoverflow.com/questions/3766698/get-end-values-from-lambda-expressions-method-parameters?rq=1

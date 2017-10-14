@@ -62,10 +62,33 @@ namespace WebsocketRPC
         /// <summary>
         /// Calls the RPC method.
         /// </summary>
-        /// <typeparam name="TResult">Result.</typeparam>
         /// <param name="functionExpression">Method getter.</param>
         /// <returns>RPC invoking task.</returns>
+        Task CallAsync(Expression<Action<T>> functionExpression);
+
+        /// <summary>
+        /// Calls the RPC method.
+        /// </summary>
+        /// <typeparam name="TResult">Result.</typeparam>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>RPC result.</returns>
         Task<TResult> CallAsync<TResult>(Expression<Func<T, TResult>> functionExpression);
+
+
+        /// <summary>
+        /// Calls the RPC method.
+        /// </summary>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>RPC task result.</returns>
+        Task<Task> CallAsync(Expression<Func<T, Task>> functionExpression);
+
+        /// <summary>
+        /// Calls the RPC method.
+        /// </summary>
+        /// <typeparam name="TResult">Result.</typeparam>
+        /// <param name="functionExpression">Method getter.</param>
+        /// <returns>RPC result.</returns>
+        Task<Task<TResult>> CallAsync<TResult>(Expression<Func<T, Task<TResult>>> functionExpression);
     }
 
     /// <summary>

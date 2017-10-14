@@ -74,7 +74,22 @@ namespace WebsocketRPC
 
         public TObj Object { get; private set; }
 
+        public async Task CallAsync(Expression<Action<TInterface>> functionExpression)
+        {
+            await rInvoker.InvokeAsync(functionExpression);
+        }
+
         public async Task<TResult> CallAsync<TResult>(Expression<Func<TInterface, TResult>> functionExpression)
+        {
+            return await rInvoker.InvokeAsync(functionExpression);
+        }
+
+        public async Task<Task> CallAsync(Expression<Func<TInterface, Task>> functionExpression)
+        {
+            return await rInvoker.InvokeAsync(functionExpression);
+        }
+
+        public async Task<Task<TResult>> CallAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
         {
             return await rInvoker.InvokeAsync(functionExpression);
         }
