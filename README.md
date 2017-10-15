@@ -69,7 +69,7 @@ api.connect(async () =>
 
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
-+ questions, comments - message on Github, or write to: darko.juric2 [at] gmail.com
++ questions, comments - Github
 + **spread the word** 
 
 ## Final word
