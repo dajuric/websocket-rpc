@@ -1,10 +1,10 @@
 <p align="center">
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="Deploy/Logo/logo-big.png" alt="WebSocketRPC logo" width="120" align="center"> </a>
+    <a href="https://www.nuget.org/profiles/dajuric"> <img src="Deploy/Logo/Logo-big.png" alt="WebSocketRPC logo" width="120" align="center"> </a>
 </p>
 
 <p align="center">
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
+    <a href="https://www.nuget.org/packages/WebsocketRPC/"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
+    <a href="https://www.nuget.org/packages/WebsocketRPC.JS/"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
 </p>
 
 **WebSokcetRPC** - RPC over weboskcets for .NET    
@@ -69,7 +69,7 @@ api.connect(async () =>
 
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
-+ questions, comments - message on Github, or write to: darko.juric2 [at] gmail.com
++ questions, comments - Github
 + **spread the word** 
 
 ## Final word
