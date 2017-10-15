@@ -8,7 +8,7 @@
     <authors>Darko Jurić</authors>
     <owners>Darko Jurić</owners>
     <licenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</licenseUrl>
-    <iconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/logo-small.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</iconUrl>
     <description>Provides full duplex RPC over websocket.</description>
     <summary>Provides full duplex RPC over websocket.</summary>
     <tags>websocket; websocket-server; websocket-client; RPC; C#; .NET</tags>
