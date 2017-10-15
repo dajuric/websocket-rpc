@@ -105,7 +105,7 @@ namespace WebsocketRPC
             }
             finally
             {
-                //webSocket?.Dispose();
+                webSocket?.Dispose();
             }
         }
     }

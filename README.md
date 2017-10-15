@@ -1,18 +1,16 @@
 <p align="center">
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="Deploy/Logo/Logo-big.png" alt="WebSocketRPC logo" width="120" align="center"> </a>
+    <a href="https://www.nuget.org/profiles/dajuric"> <img src="Deploy/Logo/logo-big.png" alt="WebSocketRPC logo" width="120" align="center"> </a>
 </p>
 
-<!--
 <p align="center">
     <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
     <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
 </p>
--->
 
 **WebSokcetRPC** - RPC over weboskcets for .NET    
 Leightweight .NET framework for making RPC over websockets. Supports full duplex connections; .NET or Javascript clients. 
 
-<!-- > **Tutorial:** <a href="http://www.codeproject.com/Articles/828012/Introducing-Lightweight-Weboskcet-RPC-library-for-Csharp" target="_blank">CodeProject article</a>-->
+ > **Tutorial:** <a href="https://www.codeproject.com/Articles/1210350/Introducing-Lightweight-WebSocket-RPC-library-for" target="_blank">CodeProject article</a>
 
 
 ## Why WebSocketRPC ?
@@ -23,11 +21,11 @@ The only dependency is <a href="https://www.newtonsoft.com/json">JSON.NET</a> li
 + **Simple**   
 There is only one relevant method: **Bind** for binding object/interface onto connection, and **CallAsync** for calling RPCs.
 
-+ **Connection relaying in a single line of code**   
- The library is capable to relay incoming requests to a background services with just one command: **Relay**
++ **Use 3rdParty assemblies as API(s)**   
+Implemented API, if used only for RPC, does not use anything from the library.
 
 + **Automatic Javascript code generation** *(WebsocketRPC.JS package)*  
- Javascript websokcet client code is automatically generated (with JsDoc comments) from an existing .NET
+ Javascript websokcet client code is automatically generated **_(with JsDoc comments)_** from an existing .NET
                         interface (API contract).
 
  
@@ -51,8 +49,7 @@ class MathAPI
 File.WriteAllText("MathAPI.js", RPCJs.GenerateCallerWithDoc<MathAPI>());
 //run server
 Server.ListenAsync("http://localhost:8000/", CancellationToken.None, 
-                    (c, wc) => c.Bind<MathAPI>(new MathAPI()))
-       .Wait(0);
+                    (c, wc) => c.Bind<MathAPI>(new MathAPI())).Wait(0);
  ``` 
 
  **Client**
@@ -68,7 +65,7 @@ api.connect(async () =>
  
 ## Getting started
 + Samples
-<!--+ <a href="http://www.codeproject.com/Articles/828012/Introducing-Lightweight-Weboskcet-RPC-library-for-Csharp" target="_blank">CodeProject article</a>-->
++ <a href="https://www.codeproject.com/Articles/1210350/Introducing-Lightweight-WebSocket-RPC-library-for" target="_blank">CodeProject article</a>
 
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.

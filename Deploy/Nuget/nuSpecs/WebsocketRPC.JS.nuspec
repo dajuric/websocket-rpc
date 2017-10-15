@@ -7,10 +7,9 @@
     <title>WebsocketRPC.JS</title>
     <authors>Darko Jurić</authors>
     <owners>Darko Jurić</owners>
-    <!--<iconUrl></iconUrl>-->
-    <description>
-      Generates the Javascript code for websocket-connection using the provided .NET interface.
-    </description>
+    <licenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</licenseUrl>
+    <iconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/logo-small.png</iconUrl>
+    <description>Generates the Javascript code for websocket-connection using the provided .NET interface.</description>
     <summary>Generates the Javascript code for websocket-connection using the provided .NET interface.</summary>
     <tags>websocket; websocket-client; Javascript; RPC; C#; .NET</tags>
 

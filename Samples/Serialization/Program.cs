@@ -72,6 +72,7 @@ namespace ServerClientJsSerialization
     class Program
     {
         //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
+        //open Index.html to run the client
         static void Main(string[] args)
         {
             RPCSettings.MaxMessageSize = 1 * 1024 * 1024; //1MiB

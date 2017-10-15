@@ -42,6 +42,7 @@ namespace ClientJsMultiService
     public class Program
     {
         //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
+        //open Index.html to run the client
         static void Main(string[] args)
         {
             //generate js code
