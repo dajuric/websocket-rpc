@@ -8,7 +8,7 @@ namespace ClientJsMultiService
     /// <summary>
     /// Numeric service providing operations on numbers.
     /// </summary>
-    public class NumericService
+    class NumericService
     {
         /// <summary>
         /// Adds two numbers.
@@ -25,7 +25,7 @@ namespace ClientJsMultiService
     /// <summary>
     /// Text service providing operations on strings.
     /// </summary>
-    public class TextService
+    class TextService
     {
         /// <summary>
         /// Concatenates two strings.
@@ -39,7 +39,7 @@ namespace ClientJsMultiService
         }
     }
 
-    public class Program
+    class Program
     {
         //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
         //open Index.html to run the client

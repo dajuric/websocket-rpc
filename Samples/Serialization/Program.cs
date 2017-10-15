@@ -38,7 +38,7 @@ namespace ServerClientJsSerialization
     /// <summary>
     /// The image processing service API.
     /// </summary>
-    public class ImageProcessingAPI
+    class ImageProcessingAPI
     {
         const int CHANNEL_COUNT = 3;
 

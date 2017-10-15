@@ -6,12 +6,12 @@ using WebsocketRPC;
 
 namespace TestClient
 {
-    public interface ILocalAPI
+    interface ILocalAPI
     {
         Task<int> LongRunningTask(int a, int b);
     }
 
-    public class RemoteAPI //:IRemoteAPI
+    class RemoteAPI //:IRemoteAPI
     {
         public void WriteProgress(float progress)
         {

@@ -6,13 +6,29 @@ using WebsocketRPC;
 
 namespace TestClientJs
 {
+    /// <summary>
+    /// Remote API.
+    /// </summary>
     interface IRemoteAPI
     {
+        /// <summary>
+        /// Writes progress.
+        /// </summary>
+        /// <param name="progress">Progress value [0..1].</param>
         void WriteProgress(float progress);
     }
 
+    /// <summary>
+    /// Local API.
+    /// </summary>
     class LocalAPI
     {
+        /// <summary>
+        /// Executes long running addition task.
+        /// </summary>
+        /// <param name="a">First number.</param>
+        /// <param name="b">Second number.</param>
+        /// <returns>Result.</returns>
         public async Task<int> LongRunningTask(int a, int b)
         {
             for (var p = 0; p <= 100; p += 5)
@@ -25,7 +41,7 @@ namespace TestClientJs
         }
     }
 
-    public class Program
+    class Program
     {
         //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
         //open Index.html to run the client

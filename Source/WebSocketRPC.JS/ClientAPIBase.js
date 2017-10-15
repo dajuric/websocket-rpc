@@ -83,6 +83,16 @@ function onMessage(msg, onError)
 */
 this.connect = function (onOpen, onError, onClose)
 {
+    if (!!onOpen === false || typeof onOpen !== 'function')
+        throw 'OnOpen function callback is missing.';
+
+    if (!!onError === false || typeof onError !== 'function')
+        throw 'OnError function callback is missing.';
+
+    if (!!onClose === false || typeof onClose !== 'function')
+        throw 'OnClose function callback is missing.';
+
+
     if (!!window.WebSocket === false)
         onError({ id: -1, title: "SOCKET_NOSUPPORT", summary: "This browser does not support Web sockets." });
 
@@ -146,7 +156,7 @@ this.onOtherMessage = null;
 this.send = (msg) => ws.send(msg);
 
 /*
- * CLoses the underlying websocket connection.
+ * Closes the underlying websocket connection.
  * @param {number} - Status code (see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes for details).
  * @param {string} - Human readable close reason (the max length is 123 bytes / ASCII characters).
 */
