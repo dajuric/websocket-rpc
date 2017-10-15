@@ -4,7 +4,7 @@
 
 :: settings
 set nugetPath=%cd%\..\..\.nuget
-set version=1.0.1
+set version=1.0.2
 set output=%cd%\bin
 
 :: Create output directory
