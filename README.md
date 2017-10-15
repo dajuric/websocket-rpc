@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.0.1-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
+    <a href="https://www.nuget.org/packages/WebsocketRPC/"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
+    <a href="https://www.nuget.org/packages/WebsocketRPC.JS/"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
 </p>
 
 **WebSokcetRPC** - RPC over weboskcets for .NET    
