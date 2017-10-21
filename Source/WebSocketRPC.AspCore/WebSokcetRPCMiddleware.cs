@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace WebSocketRPC
             }
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            var connection = new Connection { Socket = socket, Cookies = getCookies(context.Request.Cookies) };
+            var connection = new Connection(socket, getCookies(context.Request.Cookies));
 
             try
             {
@@ -53,12 +54,15 @@ namespace WebSocketRPC
             }
         }
 
-        private static CookieCollection getCookies(IRequestCookieCollection cookieCollection)
+        private static Dictionary<string, string> getCookies(IRequestCookieCollection cookieCollection)
         {
-            var cc = new CookieCollection();
+            var cc = new Dictionary<string, string>();
             foreach (var k in cookieCollection.Keys)
             {
-                cc.Add(new Cookie(k, cookieCollection[k]));
+                if (cc.ContainsKey(k))
+                    continue; //take only the first one 
+
+                cc.Add(k, cookieCollection[k]);
             }
 
             return cc;

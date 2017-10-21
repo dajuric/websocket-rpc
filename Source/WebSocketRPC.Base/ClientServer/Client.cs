@@ -24,6 +24,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,7 +94,7 @@ namespace WebSocketRPC
                 throw ex;
             }
 
-            var connection = new Connection { Socket = webSocket, Cookies = webSocket.Options.Cookies?.GetCookies(new Uri(uri)) };
+            var connection = new Connection(webSocket, CookieUtils.GetCookies(webSocket.Options.Cookies?.GetCookies(new Uri(uri))));
             try
             {
                 onConnection(connection);
@@ -106,5 +108,7 @@ namespace WebSocketRPC
 
             return isClosedSuccessfully;
         }
+
+       
     }
 }

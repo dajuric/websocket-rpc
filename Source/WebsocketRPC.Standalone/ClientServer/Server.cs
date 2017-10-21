@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -75,12 +76,12 @@ namespace WebSocketRPC
             if (!listenerContext.Request.IsWebSocketRequest)
                 return;
 
-            WebSocketContext webSocketContext = null;
+            WebSocketContext ctx = null;
             WebSocket webSocket = null;
             try
             {
-                webSocketContext = await listenerContext.AcceptWebSocketAsync(subProtocol: null);
-                webSocket = webSocketContext.WebSocket;
+                ctx = await listenerContext.AcceptWebSocketAsync(subProtocol: null);
+                webSocket = ctx.WebSocket;
             }
             catch (Exception)
             {
@@ -89,10 +90,10 @@ namespace WebSocketRPC
                 return;
             }
 
-            var connection = new Connection { Socket = webSocket, Cookies = webSocketContext.CookieCollection };
+            var connection = new Connection(webSocket, CookieUtils.GetCookies(ctx.CookieCollection));
             try
             {
-                onConnect(connection, webSocketContext);
+                onConnect(connection, ctx);
                 await Connection.ListenReceiveAsync(connection, token);
             }
             finally
