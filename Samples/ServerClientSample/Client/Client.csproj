@@ -5,9 +5,12 @@
 	
 	<PropertyGroup>
 		<OutputPath>bin\</OutputPath>
+		<ApplicationIcon />
+		<OutputType>Exe</OutputType>
+		<StartupObject />
     </PropertyGroup>
 	  
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Source\WebsocketRPC\WebsocketRPC.csproj" />
+      <ProjectReference Include="..\..\..\Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj" />
     </ItemGroup>
 </Project>

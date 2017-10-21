@@ -48,7 +48,7 @@ namespace TestClientJs
         static void Main(string[] args)
         {
             //generate js code
-            File.WriteAllText($"../Site/{nameof(LocalAPI)}.js", RPCJs.GenerateCallerWithDoc<LocalAPI>());
+            File.WriteAllText($"./Site/{nameof(LocalAPI)}.js", RPCJs.GenerateCallerWithDoc<LocalAPI>());
 
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();

@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>bin\netcoreapp2.0\AspRpc.xml</DocumentationFile>
+    <DocumentationFile>bin\$(TargetFramework)\AspRpc.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\WebSocketRPC.AspCore\WebSocketRPC.AspCore.csproj" />
-    <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.JS.csproj" />
+    <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj" />
   </ItemGroup>
-
 </Project>

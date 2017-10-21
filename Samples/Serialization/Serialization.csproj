@@ -6,6 +6,9 @@
 	<PropertyGroup>
 		<OutputPath>bin\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
   </PropertyGroup>
 		
 	<ItemGroup>
@@ -13,8 +16,8 @@
 	</ItemGroup>
   
     <ItemGroup>
-      <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.JS.csproj" />
-      <ProjectReference Include="..\..\Source\WebsocketRPC\WebsocketRPC.csproj" />
+      <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj" />
+      <ProjectReference Include="..\..\Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj" />
     </ItemGroup>
   
   	<ItemGroup>

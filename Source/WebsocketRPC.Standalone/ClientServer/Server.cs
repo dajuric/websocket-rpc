@@ -41,9 +41,9 @@ namespace WebSocketRPC
         /// </summary>
         /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
-        /// <param name="onConnection">Action executed when connection is created.</param>
+        /// <param name="onConnect">Action executed when connection is created.</param>
         /// <returns>Server task.</returns>
-        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnection)
+        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
             var listener = new HttpListener();
             listener.Prefixes.Add(httpListenerPrefix);
@@ -55,7 +55,7 @@ namespace WebSocketRPC
 
                 if (listenerContext.Request.IsWebSocketRequest)
                 {
-                    listenAsync(listenerContext, token, onConnection).Wait(0);
+                    listenAsync(listenerContext, token, onConnect).Wait(0);
                 }
                 else
                 {
@@ -70,7 +70,7 @@ namespace WebSocketRPC
             listener.Stop();
         }
 
-        static async Task listenAsync(HttpListenerContext listenerContext, CancellationToken token, Action<Connection, WebSocketContext> onConnection)
+        static async Task listenAsync(HttpListenerContext listenerContext, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
             if (!listenerContext.Request.IsWebSocketRequest)
                 return;
@@ -92,7 +92,7 @@ namespace WebSocketRPC
             var connection = new Connection { Socket = webSocket, Cookies = webSocketContext.CookieCollection };
             try
             {
-                onConnection(connection, webSocketContext);
+                onConnect(connection, webSocketContext);
                 await Connection.ListenReceiveAsync(connection, token);
             }
             finally

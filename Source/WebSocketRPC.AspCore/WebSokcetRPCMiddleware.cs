@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,18 +12,18 @@ namespace WebSocketRPC
     public class WebSocketRPCMiddleware
     {
         private readonly RequestDelegate next;
-        private Action<HttpContext, Connection> onConnection;
+        private Action<HttpContext, Connection> onConnect;
 
         /// <summary>
         /// Creates new web-socket RPC middle-ware.
         /// </summary>
         /// <param name="next">Next middle-ware in the pipeline.</param>
-        /// <param name="onConnection">Action triggered when a new connection is received.</param>
+        /// <param name="onConnect">Action triggered when a new connection is received.</param>
         public WebSocketRPCMiddleware(RequestDelegate next,
-                                      Action<HttpContext, Connection> onConnection)
+                                      Action<HttpContext, Connection> onConnect)
         {
             this.next = next;
-            this.onConnection = onConnection;
+            this.onConnect = onConnect;
         }
 
         /// <summary>
@@ -39,17 +40,28 @@ namespace WebSocketRPC
             }
 
             var socket = await context.WebSockets.AcceptWebSocketAsync();
+            var connection = new Connection { Socket = socket, Cookies = getCookies(context.Request.Cookies) };
 
-            var connection = new Connection { Socket = socket, Cookies = null /*context.Request.Cookies*/ };
             try
             {
-                onConnection(context, connection);
+                onConnect(context, connection);
                 await Connection.ListenReceiveAsync(connection, CancellationToken.None);
             }
             finally
             {
                 socket?.Dispose();
             }
+        }
+
+        private static CookieCollection getCookies(IRequestCookieCollection cookieCollection)
+        {
+            var cc = new CookieCollection();
+            foreach (var k in cookieCollection.Keys)
+            {
+                cc.Add(new Cookie(k, cookieCollection[k]));
+            }
+
+            return cc;
         }
     }
 }

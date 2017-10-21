@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ClientServer\ArraySegmentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClientServer\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientServer\Connection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\Base\Binder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\Base\IBinder.cs" />

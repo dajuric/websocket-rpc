@@ -40,14 +40,14 @@ namespace WebSocketRPC
         /// </summary>
         /// <param name="uri">The target uri of the format: "ws://(address)/[path]".</param>
         /// <param name="token">Cancellation token.</param>
-        /// <param name="onConnection">Action executed when connection is established.</param>
+        /// <param name="onConnect">Action executed when connection is established.</param>
         /// <param name="setOptions">Websocket option set method.</param>
         /// <param name="reconnectOnError">True to reconnect on error, false otherwise.</param>
         /// <param name="reconnectOnClose">True to reconnect on normal close request, false otherwise.</param>
         /// <param name="secondsBetweenReconnect">The number of seconds between two reconnect attempts.</param>
         /// <returns>Client task.</returns>
         /// <exception cref="Exception">Socket connection exception thrown in case when <paramref name="reconnectOnError"/> and <paramref name="reconnectOnClose"/> is set to false.</exception>
-        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnection, Action<ClientWebSocketOptions> setOptions = null, 
+        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnect, Action<ClientWebSocketOptions> setOptions = null, 
                                               bool reconnectOnError = true, bool reconnectOnClose = false, int secondsBetweenReconnect = 0)
         {
             var isClosedSuccessfully = true;
@@ -57,7 +57,7 @@ namespace WebSocketRPC
             {
                 try
                 {
-                    isClosedSuccessfully = await connectAsync(uri, token, onConnection, setOptions);
+                    isClosedSuccessfully = await connectAsync(uri, token, onConnect, setOptions);
                 }
                 catch (Exception ex)
                 {

@@ -4,6 +4,7 @@
     </PropertyGroup>
 
   <PropertyGroup>
+    <RootNamespace>WebsocketRPC</RootNamespace>
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   

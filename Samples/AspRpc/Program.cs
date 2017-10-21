@@ -33,8 +33,7 @@ namespace AspRpc
             {
                 app.UseDeveloperExceptionPage();
             }
-
-     
+  
             app.UseMvc();
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -42,13 +41,14 @@ namespace AspRpc
                 RequestPath = "/Site"
             });
 
+            //initialize web-sockets and bind the service
             reportingService = new ReportingService();
             app.UseWebSockets();
             app.MapWebSocketRPC("/reportingService", (hc, c) => c.Bind<ReportingService, IClientUpdate>(reportingService));
         }
     }
 
-    public class Program
+    class Program
     {
         public static void Main(string[] args)
         {

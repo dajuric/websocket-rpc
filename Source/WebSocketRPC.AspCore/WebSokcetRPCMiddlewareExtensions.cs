@@ -11,27 +11,29 @@ namespace WebSocketRPC
     {
         /// <summary>
         /// Branches the request pipeline based on matches of the given request path. If  the request path starts with the given path, the branch is executed.
+        /// <para>Make sure the 'UseWebSockets()' from Microsoft.AspNetCore.WebSockets is called before.</para>
         /// </summary>
         /// <param name="app">Application builder.</param>
         /// <param name="path">The request path to match.</param>
-        /// <param name="onConnection">Action triggered when a new connection is established.</param>
+        /// <param name="onConnect">Action triggered when a new connection is established.</param>
         /// <returns>Application builder.</returns>
         public static IApplicationBuilder MapWebSocketRPC(this IApplicationBuilder app,
                                                           PathString path,
-                                                          Action<HttpContext, Connection> onConnection)
+                                                          Action<HttpContext, Connection> onConnect)
         {
-            return app.Map(path, (_app) => _app.UseMiddleware<WebSocketRPCMiddleware>(onConnection));
+            return app.Map(path, (_app) => _app.UseMiddleware<WebSocketRPCMiddleware>(onConnect));
         }
 
         /// <summary>
         /// Adds a WebSocketRPC middleware to the application's request pipeline.
+        /// <para>Make sure the 'UseWebSockets()' from Microsoft.AspNetCore.WebSockets is called before.</para>
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="onConnection"></param>
+        /// <param name="app">Application builder.</param>
+        /// <param name="onConnect">Action triggered when a new connection is established.</param>
         /// <returns>Application builder.</returns>
-        public static IApplicationBuilder UseWebSocketRPC(this IApplicationBuilder app, Action<HttpContext, Connection> onConnection)
+        public static IApplicationBuilder UseWebSocketRPC(this IApplicationBuilder app, Action<HttpContext, Connection> onConnect)
         {
-           return app.UseMiddleware<WebSocketRPCMiddleware>(onConnection);
+           return app.UseMiddleware<WebSocketRPCMiddleware>(onConnect);
         }
     }
 }

@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E550
 		Samples\README.md = Samples\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsocketRPC", "Source\WebsocketRPC\WebsocketRPC.csproj", "{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsocketRPC.Standalone", "Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj", "{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.JS", "Source\WebSocketRPC.JS\WebSocketRPC.JS.csproj", "{965791BF-8F77-4A69-97E2-8B6B66CF9863}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.Js", "Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj", "{965791BF-8F77-4A69-97E2-8B6B66CF9863}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServerClientSample", "ServerClientSample", "{E4A64C0A-0127-42AD-A439-2063A145F536}"
 	ProjectSection(SolutionItems) = preProject

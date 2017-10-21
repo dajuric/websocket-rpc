@@ -13,7 +13,7 @@ namespace AspRpc.Controllers
         /// </summary>
         /// <returns>Home page HTML code.</returns>
         [HttpGet]
-        public RedirectResult Get()
+        public RedirectResult Index()
         {
             return new RedirectResult("/Site/Index.html");
         }
