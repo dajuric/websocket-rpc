@@ -31,7 +31,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// Represents the websocket connection.
@@ -48,7 +48,7 @@ namespace WebsocketRPC
         /// <summary>
         /// Gets the cookie collection.
         /// </summary>
-        public CookieCollection Cookies { get; internal set; }
+        public CookieCollection Cookies { get; internal set;  }
 
         /// <summary>
         /// Message receive event. Args: message, is text message.

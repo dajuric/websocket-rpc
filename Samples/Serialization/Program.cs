@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using WebsocketRPC;
+using WebSocketRPC;
 using System.Runtime.CompilerServices;
 
 namespace ServerClientJsSerialization

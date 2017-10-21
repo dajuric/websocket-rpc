@@ -29,7 +29,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// Websocket server.
@@ -55,7 +55,7 @@ namespace WebsocketRPC
 
                 if (listenerContext.Request.IsWebSocketRequest)
                 {
-                    ListenAsync(listenerContext, token, onConnection).Wait(0);
+                    listenAsync(listenerContext, token, onConnection).Wait(0);
                 }
                 else
                 {
@@ -70,15 +70,7 @@ namespace WebsocketRPC
             listener.Stop();
         }
 
-        /// <summary>
-        /// Creates and starts a new listening websocket from the provided http listener context.
-        /// <para>In case of the invalid http request / websocket creation error, the http connection is closed.</para>
-        /// </summary>
-        /// <param name="listenerContext">Http listener context.</param>
-        /// <param name="token">Cancellation token.</param>
-        /// <param name="onConnection">Action executed when connection is created.</param>
-        /// <returns>Websocket listener task.</returns>
-        public static async Task ListenAsync(HttpListenerContext listenerContext, CancellationToken token, Action<Connection, WebSocketContext> onConnection)
+        static async Task listenAsync(HttpListenerContext listenerContext, CancellationToken token, Action<Connection, WebSocketContext> onConnection)
         {
             if (!listenerContext.Request.IsWebSocketRequest)
                 return;

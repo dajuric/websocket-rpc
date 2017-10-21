@@ -27,12 +27,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NameInfoPairs = System.Collections.Generic.Dictionary<string, System.Reflection.MethodInfo>;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     class LocalInvoker<TObj>
     {

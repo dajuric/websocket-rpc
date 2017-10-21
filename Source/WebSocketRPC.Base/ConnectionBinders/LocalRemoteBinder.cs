@@ -26,16 +26,16 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using static WebsocketRPC.RPCSettings;
+using static WebSocketRPC.RPCSettings;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
-    class Binder<TObj, TInterface> : BinderBase, ILocalBinder<TObj>, IRemoteBinder<TInterface>
+    class LocalRemoteBinder<TObj, TInterface> : Binder, ILocalBinder<TObj>, IRemoteBinder<TInterface>
     {
         LocalInvoker<TObj> lInvoker = null;
         RemoteInvoker<TInterface> rInvoker = null;
 
-        public Binder(Connection connection, TObj obj)
+        public LocalRemoteBinder(Connection connection, TObj obj)
             : base(connection)
         {
             lInvoker = new LocalInvoker<TObj>();

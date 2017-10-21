@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     class RemoteInvoker<TInterface>
     {

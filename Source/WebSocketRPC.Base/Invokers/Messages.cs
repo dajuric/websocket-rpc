@@ -27,7 +27,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     struct Request
     {

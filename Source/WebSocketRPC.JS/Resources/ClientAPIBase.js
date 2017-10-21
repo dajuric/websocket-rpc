@@ -63,7 +63,7 @@ function onMessage(msg, onError)
     var data = null;
     try { data = JSON.parse(msg.data); } catch (e) { }
 
-    var isRPCResponse = (data !== null) && !!registeredFunctions[data.FunctionName] && (!!data.ReturnValue || !!data.Error);
+    var isRPCResponse = (data !== null) && !!registeredFunctions[data.FunctionName] && (data.ReturnValue !== undefined || !!data.Error);
     var isCallRequest = (data !== null) && !!data.Arguments;
 
     if (isRPCResponse)

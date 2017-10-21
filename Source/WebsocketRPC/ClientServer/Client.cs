@@ -28,7 +28,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// Websocket client.

@@ -31,7 +31,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     static class JsCallerGenerator
     {
@@ -80,7 +80,7 @@ namespace WebsocketRPC
 
             //API base
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = assembly.GetName().Name + "." + "ClientAPIBase.js";
+            var resourceName = assembly.GetManifestResourceNames().First(x => x.Contains("ClientAPIBase.js"));
 
             var lines = new List<string>();
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))

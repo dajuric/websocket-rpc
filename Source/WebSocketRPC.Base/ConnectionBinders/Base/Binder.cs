@@ -24,25 +24,39 @@
 #endregion
 
 using System;
-using System.Text;
+using System.Diagnostics;
 
-namespace WebsocketRPC
+
+namespace WebSocketRPC
 {
-    /// <summary>
-    /// Provides the helper methods.
-    /// </summary>
-    public static class HelperExtensions
+    abstract class Binder : IBinder
     {
-        /// <summary>
-        /// Converts the specified binary data to a string data using the specified encoding.
-        /// </summary>
-        /// <param name="segment">Binary data.</param>
-        /// <param name="e">Encoding.</param>
-        /// <returns>Text data.</returns>
-        public static string ToString(this ArraySegment<byte> segment, Encoding e)
+        public Connection Connection { get; private set; }
+
+        protected Binder(Connection connection)
         {
-            var str = e.GetString(segment.Array, segment.Offset, segment.Count);
-            return str;
+            Connection = connection;
+
+            Connection.OnOpen += () =>
+            {
+                Debug.WriteLine("Open");
+
+                RPC.AllBinders.Add(this);
+            };
+
+            Connection.OnClose += () =>
+            {
+                Debug.WriteLine("Close");
+
+                RPC.AllBinders.Remove(this);
+            };
+
+            Connection.OnError += e =>
+            {
+                Debug.WriteLine("Error");
+
+                RPC.AllBinders.Remove(this);
+            };
         }
     }
 }

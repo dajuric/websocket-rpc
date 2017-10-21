@@ -28,7 +28,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Text;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// RPC settings.

@@ -1,36 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
-    </PropertyGroup>
-	
-	<PropertyGroup>
-		<OutputPath>bin\</OutputPath>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
   </PropertyGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Include="Resources\ClientAPIBase.js" />
-	</ItemGroup>
+  <PropertyGroup>
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.JS.xml</DocumentationFile>
+    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.AspCore.xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <Import Project="..\WebSocketRPC.Base\WebSocketRPC.Base.projitems" Label="Shared" />
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0" />
+  </ItemGroup>
   
   <!-- NuGet -->
   <PropertyGroup>
     <Authors>Darko Jurić</Authors>
-    <Description>Generates the Javascript code for websocket-connection using the provided .NET interface.</Description>
+    <Description>WebSocket RPC for ASP.NET Core.</Description>
     <Copyright>Darko Jurić</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/dajuric/websocket-rpc/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dajuric/websocket-rpc/</RepositoryUrl>
-    <PackageTags>websocket; websocket-client; Javascript; RPC; C#; .NET</PackageTags>
+    <PackageTags>websocket; ASP.NET; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
     <Version>1.0.0</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
-    <RootNamespace>WebSocketRPC</RootNamespace>    
+    <RootNamespace>WebSocketRPC</RootNamespace>
   </PropertyGroup>
   
 </Project>

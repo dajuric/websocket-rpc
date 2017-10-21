@@ -30,7 +30,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// Contains function related to Javascript RPC.

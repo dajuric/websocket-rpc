@@ -50,18 +50,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logo", "Logo", "{6E575BA8-2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE}"
 	ProjectSection(SolutionItems) = preProject
-		Deploy\Nuget\Build.cmd = Deploy\Nuget\Build.cmd
 		Deploy\Nuget\Push.cmd = Deploy\Nuget\Push.cmd
-		Deploy\Nuget\UpdateNuGet.cmd = Deploy\Nuget\UpdateNuGet.cmd
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuSpecs", "nuSpecs", "{07BE9233-A701-4899-8FB0-21D8EE0057D3}"
-	ProjectSection(SolutionItems) = preProject
-		Deploy\Nuget\nuSpecs\WebsocketRPC.JS.nuspec = Deploy\Nuget\nuSpecs\WebsocketRPC.JS.nuspec
-		Deploy\Nuget\nuSpecs\WebsocketRPC.nuspec = Deploy\Nuget\nuSpecs\WebsocketRPC.nuspec
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WebSocketRPC.Base", "Source\WebSocketRPC.Base\WebSocketRPC.Base.shproj", "{EAEBAA06-D5BB-4106-8694-C022832175D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.AspCore", "Source\WebSocketRPC.AspCore\WebSocketRPC.AspCore.csproj", "{CE4BAD88-2358-4B3D-8A34-90A74C73E521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspRpc", "Samples\AspRpc\AspRpc.csproj", "{CFC334A5-2B52-42A0-87AE-4B3F84B09530}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Source\WebSocketRPC.Base\WebSocketRPC.Base.projitems*{eaebaa06-d5bb-4106-8694-c022832175d6}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -95,6 +96,14 @@ Global
 		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE4BAD88-2358-4B3D-8A34-90A74C73E521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4BAD88-2358-4B3D-8A34-90A74C73E521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4BAD88-2358-4B3D-8A34-90A74C73E521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4BAD88-2358-4B3D-8A34-90A74C73E521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFC334A5-2B52-42A0-87AE-4B3F84B09530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFC334A5-2B52-42A0-87AE-4B3F84B09530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFC334A5-2B52-42A0-87AE-4B3F84B09530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFC334A5-2B52-42A0-87AE-4B3F84B09530}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,7 +119,9 @@ Global
 		{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
 		{6E575BA8-2787-4A5D-9742-8ACBA07C93D9} = {B998D2DB-7CA7-4A1B-8B98-801973A12D20}
 		{CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE} = {B998D2DB-7CA7-4A1B-8B98-801973A12D20}
-		{07BE9233-A701-4899-8FB0-21D8EE0057D3} = {CBCEF1A5-1044-49DB-8A19-2443FFBE3DFE}
+		{EAEBAA06-D5BB-4106-8694-C022832175D6} = {3CE373E0-6D9A-48C4-808D-510E6FB69D5C}
+		{CE4BAD88-2358-4B3D-8A34-90A74C73E521} = {3CE373E0-6D9A-48C4-808D-510E6FB69D5C}
+		{CFC334A5-2B52-42A0-87AE-4B3F84B09530} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {591A6475-8DF2-42DA-AFF1-8EF88BCF6EE4}

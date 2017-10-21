@@ -26,11 +26,11 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using static WebsocketRPC.RPCSettings;
+using static WebSocketRPC.RPCSettings;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
-    class RemoteBinder<TInterface> : BinderBase, IRemoteBinder<TInterface>
+    class RemoteBinder<TInterface> : Binder, IRemoteBinder<TInterface>
     {
         RemoteInvoker<TInterface> rInvoker = null;
 

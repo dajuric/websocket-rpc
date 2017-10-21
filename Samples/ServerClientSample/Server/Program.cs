@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using WebsocketRPC;
+using WebSocketRPC;
 
 namespace TestServer
 {

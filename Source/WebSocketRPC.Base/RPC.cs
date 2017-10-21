@@ -30,7 +30,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
     /// <summary>
     /// Provides methods for invoking the RPC.
@@ -40,7 +40,7 @@ namespace WebsocketRPC
         /// <summary>
         /// Gets the all binders.
         /// </summary>
-        public static readonly List<IBinder> AllBinders = new List<IBinder>();
+        internal static readonly List<IBinder> AllBinders = new List<IBinder>();
 
         /// <summary>
         /// Creates two-way RPC receiving-sending binding for the provided connection.
@@ -51,8 +51,8 @@ namespace WebsocketRPC
         /// <param name="obj">Object to bind to.</param>
         /// <returns>Binder.</returns>
         public static IBinder Bind<TObj, TInterface>(this Connection connection, TObj obj)
-        {
-            return new Binder<TObj, TInterface>(connection, obj);
+        { 
+            return new LocalRemoteBinder<TObj, TInterface>(connection, obj);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace WebsocketRPC
         /// </summary>
         /// <param name="data">Received data.</param>
         /// <returns>True if the data contain RPC message, false otherwise.</returns>
-        public static bool IsRPC(this ArraySegment<byte> data)
+        public static bool IsRpcMessage(this ArraySegment<byte> data)
         {
             var str = data.ToString(Encoding.ASCII);
             return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;

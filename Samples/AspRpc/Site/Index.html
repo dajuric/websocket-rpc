@@ -1,0 +1,66 @@
+﻿<html>
+    <head>
+        <script src="ReportingService.js"></script>
+    </head>
+
+    <body>
+        <button id="start">Start</button> <button id="stop">Stop</button>
+        <p id="msg"></p>
+
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            var btnStart = document.getElementById("start");
+            var btnStop = document.getElementById("stop");
+
+            //init API
+            var baseUri = "ws://localhost:8000/"
+            var service = new ReportingService(baseUri + "reportingService/");
+
+            function implementClientUpdate(api)
+            {
+                api.write = writeMsg;
+                api.onStart = () =>
+                {
+                    btnStart.disabled = true;
+                    btnStop.disabled = false;
+                };
+                api.onStop = () =>
+                {
+                    btnStart.disabled = false;
+                    btnStop.disabled = true;
+                };
+            }
+
+            async function exec(api)
+            {
+                var isRunning = await api.isRunning();
+                btnStart.disabled = isRunning;
+                btnStop.disabled = !isRunning;
+
+                btnStart.onclick = async () =>
+                {
+                    try { await api.start(); }
+                    catch (err) { writeMsg(err, 'red'); }
+                }
+                btnStop.onclick = async () =>
+                {
+                    try { await api.stop(); }
+                    catch (err) { writeMsg(err, 'red'); }
+                }
+            }
+
+            implementClientUpdate(service);
+            service.connect(() => exec(service), err => writeMsg(err, 'red'), msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>

@@ -24,11 +24,11 @@
 #endregion
 
 using System;
-using static WebsocketRPC.RPCSettings;
+using static WebSocketRPC.RPCSettings;
 
-namespace WebsocketRPC
+namespace WebSocketRPC
 {
-    class LocalBinder<TObj> : BinderBase, ILocalBinder<TObj>
+    class LocalBinder<TObj> : Binder, ILocalBinder<TObj>
     {
         LocalInvoker<TObj> lInvoker = null;
 
