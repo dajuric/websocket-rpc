@@ -10,7 +10,9 @@
 **WebSokcetRPC** - RPC over weboskcets for .NET    
 Leightweight .NET framework for making RPC over websockets. Supports full duplex connections; .NET or Javascript clients. 
 
- > **Tutorial:** <a href="https://www.codeproject.com/Articles/1210350/Introducing-Lightweight-WebSocket-RPC-library-for" target="_blank">CodeProject article</a>
+<!--
+ > **Tutorial:** <a href="https://www.codeproject.com/Articles/0000/Introducing-Leightweight-WebSocket-RPC-library" target="_blank">CodeProject article</a>
+-->
 
 
 ## Why WebSocketRPC ?
@@ -65,7 +67,9 @@ api.connect(async () =>
  
 ## Getting started
 + Samples
-+ <a href="https://www.codeproject.com/Articles/1210350/Introducing-Lightweight-WebSocket-RPC-library-for" target="_blank">CodeProject article</a>
+<!--
++ <a href="https://www.codeproject.com/Articles/0000/Introducing-Leightweight-WebSocket-RPC-library" target="_blank">CodeProject article</a>
+-->
 
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
