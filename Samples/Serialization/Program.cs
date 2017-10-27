@@ -55,7 +55,7 @@ namespace ServerClientJsSerialization
 
             Bgr<byte>[,] image = null;
             try { image = imgUrl.GetBytes().DecodeAsColorImage(); }
-            catch { throw new Exception("The specified url does not point to a valid image."); }
+            catch(Exception ex) { throw new Exception("The specified url does not point to a valid image."); }
 
             image.Apply(c => swapChannels(c, order), inPlace: true);
             return image;
@@ -66,24 +66,26 @@ namespace ServerClientJsSerialization
             var uC = (byte*)Unsafe.AsPointer(ref c);
             var swapC = new Bgr<byte>(uC[order[0]], uC[order[1]], uC[order[2]]);
             return swapC;
-        }
+        }    
     }
 
     class Program
     {
-        //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
+        //if access denied execute: "cmd"
         //open Index.html to run the client
         static void Main(string[] args)
         {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+
             RPCSettings.MaxMessageSize = 1 * 1024 * 1024; //1MiB
             RPCSettings.AddConverter(new JpgBase64Converter());
             
             //generate js code
-            File.WriteAllText($"../Site/{nameof(ImageProcessingAPI)}.js", RPCJs.GenerateCallerWithDoc<ImageProcessingAPI>());
+            File.WriteAllText($"../../Site/{nameof(ImageProcessingAPI)}.js", RPCJs.GenerateCallerWithDoc<ImageProcessingAPI>());
 
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();
-            Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI())).Wait(0);
+            Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI())).Wait();
  
             Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(ServerClientJsSerialization));
             Console.ReadLine();

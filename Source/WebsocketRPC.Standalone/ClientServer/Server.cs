@@ -24,7 +24,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -46,6 +45,23 @@ namespace WebSocketRPC
         /// <returns>Server task.</returns>
         public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
+            await ListenAsync(httpListenerPrefix, token, onConnect, (rq, rp) => 
+            {
+                rp.StatusCode = (int)HttpStatusCode.BadRequest;
+            });
+        }
+
+        /// <summary>
+        /// Creates and starts a new instance of the http / websocket server.
+        /// <para>All HTTP requests will have the 'BadRequest' response.</para>
+        /// </summary>
+        /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <param name="onConnect">Action executed when connection is created.</param>
+        /// <param name="onHttpRequest">Action executed on HTTP request.</param>
+        /// <returns>Server task.</returns>
+        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Action<HttpListenerRequest, HttpListenerResponse> onHttpRequest)
+        {
             var listener = new HttpListener();
             listener.Prefixes.Add(httpListenerPrefix);
             listener.Start();
@@ -60,7 +76,7 @@ namespace WebSocketRPC
                 }
                 else
                 {
-                    listenerContext.Response.StatusCode = 400;
+                    onHttpRequest(listenerContext.Request, listenerContext.Response);
                     listenerContext.Response.Close();
                 }
 

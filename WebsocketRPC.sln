@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{3CE373E0-6D9A-48C4-808D-510E6FB69D5C}"
 EndProject
@@ -10,29 +10,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E550
 		Samples\README.md = Samples\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsocketRPC.Standalone", "Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj", "{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebsocketRPC.Standalone", "Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj", "{AB4A5DDF-1F91-4AF8-9E9C-242832576C5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.Js", "Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj", "{965791BF-8F77-4A69-97E2-8B6B66CF9863}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketRPC.Js", "Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj", "{965791BF-8F77-4A69-97E2-8B6B66CF9863}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServerClientSample", "ServerClientSample", "{E4A64C0A-0127-42AD-A439-2063A145F536}"
 	ProjectSection(SolutionItems) = preProject
 		Samples\ServerClientSample\Run.bat = Samples\ServerClientSample\Run.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerClientJs", "Samples\ClientJs\ServerClientJs.csproj", "{C0449FA5-C667-4B5C-878A-04773903B130}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerClientJs", "Samples\ClientJs\ServerClientJs.csproj", "{C0449FA5-C667-4B5C-878A-04773903B130}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Samples\ServerClientSample\Client\Client.csproj", "{E0DBB446-3B2B-4BC2-871F-925AB60917E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Samples\ServerClientSample\Client\Client.csproj", "{E0DBB446-3B2B-4BC2-871F-925AB60917E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Samples\ServerClientSample\Server\Server.csproj", "{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Samples\ServerClientSample\Server\Server.csproj", "{841054C8-559B-4E6F-8DCD-44C2D3DA2F0B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{26CCD24E-8415-4FD5-8AB3-17433A265B08}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiService", "Samples\MultiService\MultiService.csproj", "{2B69F62E-991C-4E4B-B1FF-2A5906415764}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiService", "Samples\MultiService\MultiService.csproj", "{2B69F62E-991C-4E4B-B1FF-2A5906415764}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization", "Samples\Serialization\Serialization.csproj", "{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serialization", "Samples\Serialization\Serialization.csproj", "{9F82F6DD-238B-4F65-A95C-55F2BA20F1B0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6B3680DB-211E-492C-BC67-46FF1F00A730}"
 	ProjectSection(SolutionItems) = preProject
@@ -55,9 +55,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{CBCEF1A5
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WebSocketRPC.Base", "Source\WebSocketRPC.Base\WebSocketRPC.Base.shproj", "{EAEBAA06-D5BB-4106-8694-C022832175D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketRPC.AspCore", "Source\WebSocketRPC.AspCore\WebSocketRPC.AspCore.csproj", "{CE4BAD88-2358-4B3D-8A34-90A74C73E521}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketRPC.AspCore", "Source\WebSocketRPC.AspCore\WebSocketRPC.AspCore.csproj", "{CE4BAD88-2358-4B3D-8A34-90A74C73E521}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspRpc", "Samples\AspRpc\AspRpc.csproj", "{CFC334A5-2B52-42A0-87AE-4B3F84B09530}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspRpc", "Samples\AspRpc\AspRpc.csproj", "{CFC334A5-2B52-42A0-87AE-4B3F84B09530}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

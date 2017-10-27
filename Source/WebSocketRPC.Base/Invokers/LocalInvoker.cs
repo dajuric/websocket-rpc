@@ -59,7 +59,7 @@ namespace WebSocketRPC
         {
             //check constraints
             if (typeof(TObj).IsInterface)
-                throw new Exception("The specified type must be a object type.");
+                throw new Exception("The specified type must be a class.");
 
             var overloadedMethodNames = methodList.GroupBy(x => x.Name)
                                                   .DefaultIfEmpty()
@@ -71,20 +71,31 @@ namespace WebSocketRPC
 
             var propertyList = typeof(TObj).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             if (propertyList.Any())
-                throw new NotSupportedException("The interface must not declare any properties: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
+                throw new NotSupportedException("The class must not declare any properties: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
         }
 
         public async Task<Response> InvokeAsync(TObj obj, Request clientMessage)
         {
-            var (result, error) = await invokeAsync(obj, clientMessage.FunctionName, clientMessage.Arguments);
+            JToken result = null;
+            Exception error = null;
+
+            try
+            {
+                result = await invokeAsync(obj, clientMessage.FunctionName, clientMessage.Arguments);
+            }
+            catch (Exception ex)
+            {
+                while (ex.InnerException != null) ex = ex.InnerException;
+                error = ex;
+            }
 
             return new Response { FunctionName = clientMessage.FunctionName, ReturnValue = result, Error = error?.Message };
         }
 
-        async Task<(JToken Result, Exception Error)> invokeAsync(TObj obj, string functionName, JToken[] args)
+        async Task<JToken> invokeAsync(TObj obj, string functionName, JToken[] args)
         {
             if (!methods.ContainsKey(functionName))
-                throw new ArgumentException(functionName +  ": The object does not contain the provided method name: " + functionName + ".");
+                throw new ArgumentException(functionName + ": The object does not contain the provided method name: " + functionName + ".");
 
             var methodParams = methods[functionName].GetParameters();
             if (methodParams.Length != args.Length)
@@ -94,30 +105,23 @@ namespace WebSocketRPC
             for (int i = 0; i < methodParams.Length; i++)
                 argObjs[i] = args[i].ToObject(methodParams[i].ParameterType, RPCSettings.Serializer);
 
-            try
-            {
-                var hasResult = methods[functionName].ReturnType != typeof(void) &&
-                                methods[functionName].ReturnType != typeof(Task);
 
-                JToken result = null;
-                if (hasResult)
-                {
-                    var returnVal = await invokeWithResultAsync(methods[functionName], obj, argObjs);
-                    result = (returnVal != null) ? JToken.FromObject(returnVal, RPCSettings.Serializer) : null;
-                }
-                else
-                {
-                    await invokeAsync(methods[functionName], obj, argObjs);
-                    result = JToken.FromObject(true);
-                }
+            var hasResult = methods[functionName].ReturnType != typeof(void) &&
+                            methods[functionName].ReturnType != typeof(Task);
 
-                return (result, null);
-            }
-            catch (Exception ex)
+            JToken result = null;
+            if (hasResult)
             {
-                while (ex.InnerException != null) ex = ex.InnerException;
-                return (null, ex);
+                var returnVal = await invokeWithResultAsync(methods[functionName], obj, argObjs);
+                result = (returnVal != null) ? JToken.FromObject(returnVal, RPCSettings.Serializer) : null;
             }
+            else
+            {
+                await invokeAsync(methods[functionName], obj, argObjs);
+                result = JToken.FromObject(true);
+            }
+
+            return result;
         }
 
         async Task invokeAsync(MethodInfo method, TObj obj, object[] args)
