@@ -67,6 +67,20 @@ namespace WebSocketRPC
             return (objType.Name, methodList);
         }
 
+        public static string GenerateRequireJsHeader(string className)
+        {
+            var t = new string[] {
+                $"define(() => {className}); //'require.js' support"
+            };
+
+            var sb = new StringBuilder();
+            sb.Append(String.Join(Environment.NewLine, t));
+            sb.Append(Environment.NewLine);
+            sb.Append(Environment.NewLine);
+
+            return sb.ToString();
+        }
+
         public static string GenerateHeader(string className)
         {
             var t = new string[] {
@@ -107,7 +121,7 @@ namespace WebSocketRPC
                 $"\t this.{jsMName} = function({argList}) {{",
                 $"\t    return callRPC(\"{methodName}\", Object.values(this.{jsMName}.arguments));",
                 $"\t }};",
-                $""
+                $"{Environment.NewLine}"
             };
 
             var sb = new StringBuilder();

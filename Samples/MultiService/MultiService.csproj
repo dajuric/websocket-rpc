@@ -8,6 +8,8 @@
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
 		<StartupObject />
+
+    <DocumentationFile>bin\$(TargetFramework)\MultiService.xml</DocumentationFile>
     </PropertyGroup>
 	  
     <ItemGroup>

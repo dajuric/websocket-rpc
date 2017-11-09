@@ -36,13 +36,7 @@ namespace WebSocketRPC
         protected Binder(Connection connection)
         {
             Connection = connection;
-
-            Connection.OnOpen += () =>
-            {
-                Debug.WriteLine("Open");
-
-                RPC.AllBinders.Add(this);
-            };
+            RPC.AllBinders.Add(this);
 
             Connection.OnClose += () =>
             {

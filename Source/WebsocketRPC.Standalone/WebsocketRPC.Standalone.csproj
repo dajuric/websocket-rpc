@@ -32,6 +32,9 @@
 
     <Version>1.0.0</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
+
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
   <Import Project="..\WebSocketRPC.Base\WebSocketRPC.Base.projitems" Label="Shared" />
   

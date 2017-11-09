@@ -42,6 +42,7 @@ namespace WebSocketRPC
         static string messageToBig = "The message exceeds the maximum allowed message size: {0} bytes.";
 
         WebSocket socket;
+        TaskQueue sendTaskQueue;
 
         /// <summary>
         /// Creates new connection.
@@ -51,6 +52,7 @@ namespace WebSocketRPC
         internal protected Connection(WebSocket socket, IReadOnlyDictionary<string, string> cookies)
         {
             this.socket = socket;
+            this.sendTaskQueue = new TaskQueue();
             this.Cookies = cookies;
         }
 
@@ -92,7 +94,8 @@ namespace WebSocketRPC
                 return false;
             }
 
-            await socket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
+            Debug.WriteLine("Sending binary data.");
+            await sendTaskQueue.Enqueue(() => sendAsync(data, WebSocketMessageType.Binary));
             return true;
         }
 
@@ -116,8 +119,21 @@ namespace WebSocketRPC
             }
 
             Debug.WriteLine("Sending: " + data);
-            await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+            await sendTaskQueue.Enqueue(() => sendAsync(segment, WebSocketMessageType.Text));
             return true;
+        }
+
+        async Task sendAsync(ArraySegment<byte> data, WebSocketMessageType msgType)
+        {
+            try
+            {
+                await socket.SendAsync(data, msgType, true, CancellationToken.None);
+            }
+            catch(Exception ex)
+            {
+                if (socket.State != WebSocketState.Open)
+                    await CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
+            }
         }
 
         /// <summary>
@@ -128,12 +144,18 @@ namespace WebSocketRPC
         /// <returns>Task.</returns>
         public async Task CloseAsync(WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure, string statusDescription = "")
         {
-            if (socket.State != WebSocketState.Open)
-                return;
-
-            await socket.CloseOutputAsync(closeStatus, statusDescription, CancellationToken.None);
-            OnClose?.Invoke();
-            clearEvents();
+            try
+            {
+                if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
+                    await socket.CloseOutputAsync(closeStatus, statusDescription, CancellationToken.None);
+            }
+            catch
+            { } //do not propagate the exception
+            finally
+            {
+                OnClose?.Invoke();
+                clearEvents();
+            }
         }
 
         /// <summary>
@@ -151,7 +173,7 @@ namespace WebSocketRPC
                 {
                     connection.OnOpen?.Invoke();
                     byte[] receiveBuffer = new byte[RPCSettings.MaxMessageSize];
-
+                    
                     while (webSocket.State == WebSocketState.Open)
                     {
                         WebSocketReceiveResult receiveResult = null;
@@ -186,9 +208,8 @@ namespace WebSocketRPC
                 }
                 catch (Exception ex)
                 {
-                    while (ex.InnerException != null) ex = ex.InnerException;
                     connection.OnError?.Invoke(ex);
-                    connection.OnClose?.Invoke();
+                    await connection.CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
                     //socket will be aborted -> no need to close manually
                 }
             }
@@ -205,7 +226,6 @@ namespace WebSocketRPC
 
         private void clearEvents()
         {
-            OnOpen = null;
             OnClose = null;
             OnError = null;
             OnReceive = null;

@@ -77,13 +77,13 @@ namespace WebSocketRPC
                                           IList<string> pNames, IList<Type> pTypes, Type returnType, string linePrefix = "\t")
         {
             var mElem = getMethod(mmebers, methodName);
+            if (mElem == null) return String.Empty;
 
             var s = getSummary(mElem);
             var p = getParams(mElem);
             var r = getReturn(mElem);
 
             var jsDoc = new StringBuilder();
-            jsDoc.AppendLine();
             jsDoc.AppendLine(String.Format("{0}/**", linePrefix));
             {
                 jsDoc.AppendLine(String.Format("{0} * @description - {1}", linePrefix, s));

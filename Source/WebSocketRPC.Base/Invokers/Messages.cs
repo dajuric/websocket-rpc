@@ -36,7 +36,10 @@ namespace WebSocketRPC
 
         public static Request FromJson(string json)
         {
-            var root = JObject.Parse(json);
+            JObject root = null;
+            try { root = JObject.Parse(json); }
+            catch { return default(Request); }
+
             var r = new Request
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),
@@ -65,7 +68,10 @@ namespace WebSocketRPC
 
         public static Response FromJson(string json)
         {
-            var root = JObject.Parse(json);
+            JObject root = null;
+            try { root = JObject.Parse(json); }
+            catch { return default(Response); }
+
             var r = new Response
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),

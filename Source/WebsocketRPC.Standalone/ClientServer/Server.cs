@@ -39,6 +39,34 @@ namespace WebSocketRPC
         /// <summary>
         /// Creates and starts a new instance of the http / websocket server.
         /// </summary>
+        /// <param name="port">The http/https URI listening port.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <param name="onConnect">Action executed when connection is created.</param>
+        /// <returns>Server task.</returns>
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
+        {
+            await ListenAsync($"http://+:{port}/", token, onConnect);
+        }
+
+        /// <summary>
+        /// Creates and starts a new instance of the http / websocket server.
+        /// <para>All HTTP requests will have the 'BadRequest' response.</para>
+        /// </summary>
+        /// <param name="port">The http/https URI listening port.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <param name="onConnect">Action executed when connection is created.</param>
+        /// <param name="onHttpRequest">Action executed on HTTP request.</param>
+        /// <returns>Server task.</returns>
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Action<HttpListenerRequest, HttpListenerResponse> onHttpRequest)
+        {
+            await ListenAsync($"http://+:{port}/", token, onConnect, onHttpRequest);
+        }
+
+
+
+        /// <summary>
+        /// Creates and starts a new instance of the http / websocket server.
+        /// </summary>
         /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
@@ -64,52 +92,70 @@ namespace WebSocketRPC
         {
             var listener = new HttpListener();
             listener.Prefixes.Add(httpListenerPrefix);
-            listener.Start();
-           
-            while (true)
+
+            try { listener.Start(); }
+            catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
             {
-                HttpListenerContext listenerContext = await listener.GetContextAsync();
-
-                if (listenerContext.Request.IsWebSocketRequest)
-                {
-                    listenAsync(listenerContext, token, onConnect).Wait(0);
-                }
-                else
-                {
-                    onHttpRequest(listenerContext.Request, listenerContext.Response);
-                    listenerContext.Response.Close();
-                }
-
-                if (token.IsCancellationRequested)
-                    break;
+                throw new UnauthorizedAccessException($"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
+                                                      $"Please run (elevated): 'netsh add urlacl url={httpListenerPrefix} user=\"Everyone\"'.");
             }
-            
-            listener.Stop();
+
+            ///using (var r = token.Register(() => listener.Stop()))
+            {
+                bool shouldStop = false;
+                while (!shouldStop)
+                {
+                    try
+                    {
+                        HttpListenerContext ctx = await listener.GetContextAsync();
+
+                        if (ctx.Request.IsWebSocketRequest)
+                        {
+                            listenAsync(ctx, token, onConnect).Wait(0);
+                        }
+                        else
+                        {
+                            onHttpRequest(ctx.Request, ctx.Response);
+                            ctx.Response.Close();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        if (!token.IsCancellationRequested)
+                            throw;
+                    }
+                    finally
+                    {
+                        if (token.IsCancellationRequested)
+                            shouldStop = true;
+                    }
+                }
+            }
         }
 
-        static async Task listenAsync(HttpListenerContext listenerContext, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
+        static async Task listenAsync(HttpListenerContext ctx, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
-            if (!listenerContext.Request.IsWebSocketRequest)
+            if (!ctx.Request.IsWebSocketRequest)
                 return;
 
-            WebSocketContext ctx = null;
+            WebSocketContext wsCtx = null;
             WebSocket webSocket = null;
             try
             {
-                ctx = await listenerContext.AcceptWebSocketAsync(subProtocol: null);
-                webSocket = ctx.WebSocket;
+                wsCtx = await ctx.AcceptWebSocketAsync(subProtocol: null);
+                webSocket = wsCtx.WebSocket;
             }
             catch (Exception)
             {
-                listenerContext.Response.StatusCode = 500;
-                listenerContext.Response.Close();
+                ctx.Response.StatusCode = 500;
+                ctx.Response.Close();
                 return;
             }
 
-            var connection = new Connection(webSocket, CookieUtils.GetCookies(ctx.CookieCollection));
+            var connection = new Connection(webSocket, CookieUtils.GetCookies(wsCtx.CookieCollection));
             try
             {
-                onConnect(connection, ctx);
+                onConnect(connection, wsCtx);
                 await Connection.ListenReceiveAsync(connection, token);
             }
             finally

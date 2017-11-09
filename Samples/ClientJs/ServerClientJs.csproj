@@ -8,6 +8,8 @@
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
 		<StartupObject />
+
+    <DocumentationFile>bin\$(TargetFramework)\ServerClientJs.xml</DocumentationFile>
   </PropertyGroup>
 	
 	<ItemGroup>

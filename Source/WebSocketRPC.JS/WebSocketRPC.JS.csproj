@@ -30,7 +30,10 @@
 
     <Version>1.0.0</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
-    <RootNamespace>WebSocketRPC</RootNamespace>    
+    <RootNamespace>WebSocketRPC</RootNamespace>
+    
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
   
 </Project>

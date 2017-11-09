@@ -26,7 +26,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -41,13 +40,16 @@ namespace WebSocketRPC
         /// Generates Javascript code from the provided class or interface type.
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
-        /// <param name="omittedMethods">The methods of the class / interface that should be omitted when creating the Javascript code.</param>
+        /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
         /// <returns>Javascript API.</returns>
-        public static string GenerateCaller<T>(params Expression<Action<T>>[] omittedMethods)
+        public static string GenerateCaller<T>(RPCJsSettings<T> settings =  null)
         {
-            var (tName, mInfos) = JsCallerGenerator.GetMethods<T>(omittedMethods);
+            settings = settings ?? new RPCJsSettings<T>();
+            var (tName, mInfos) = JsCallerGenerator.GetMethods(settings.OmittedMethods);
+            tName = settings.NameOverwrite ?? tName;
 
             var sb = new StringBuilder();
+            if(settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
             sb.Append(JsCallerGenerator.GenerateHeader(tName));
 
             foreach (var m in mInfos)
@@ -67,15 +69,18 @@ namespace WebSocketRPC
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
         /// <param name="xmlDocPath">Xml assembly definition file.</param>
-        /// <param name="omittedMethods">The methods of the class / interface that should be omitted when creating the Javascript code.</param>
+        /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
         /// <returns>Javascript API.</returns>
-        public static string GenerateCallerWithDoc<T>(string xmlDocPath, params Expression<Action<T>>[] omittedMethods)
+        public static string GenerateCallerWithDoc<T>(string xmlDocPath, RPCJsSettings<T> settings = null)
         {
-            var (tName, mInfos) = JsCallerGenerator.GetMethods(omittedMethods);
+            settings = settings ?? new RPCJsSettings<T>();
+            var (tName, mInfos) = JsCallerGenerator.GetMethods(settings.OmittedMethods);
+            tName = settings.NameOverwrite ?? tName;
 
             var xmlMemberNodes = JsDocGenerator.GetMemberNodes(xmlDocPath);
-            var sb = new StringBuilder();
 
+            var sb = new StringBuilder();
+            if (settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
             sb.Append(JsDocGenerator.GetClassDoc(xmlMemberNodes, tName));
             sb.Append(JsCallerGenerator.GenerateHeader(tName));
 
@@ -98,9 +103,9 @@ namespace WebSocketRPC
         /// <para>The xml assembly definition is taken form the executing assembly if available.</para>
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
-        /// <param name="omittedMethods">The methods of the class / interface that should be omitted when creating the Javascript code.</param>
+        /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
         /// <returns>Javascript API.</returns>
-        public static string GenerateCallerWithDoc<T>(params Expression<Action<T>>[] omittedMethods)
+        public static string GenerateCallerWithDoc<T>(RPCJsSettings<T> settings = null)
         {
             var assembly = Assembly.GetEntryAssembly();
             var fInfo = new FileInfo(assembly.Location);
@@ -108,9 +113,9 @@ namespace WebSocketRPC
             var xmlDocPath = Path.ChangeExtension(assembly.Location, ".xml");
 
             if (!File.Exists(xmlDocPath))
-                return GenerateCaller(omittedMethods);
+                return GenerateCaller(settings);
             else
-                return GenerateCallerWithDoc(xmlDocPath, omittedMethods);
+                return GenerateCallerWithDoc(xmlDocPath, settings);
         }
     }
 }
