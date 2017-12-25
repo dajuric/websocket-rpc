@@ -38,7 +38,7 @@ namespace WebSocketRPC
     /// </summary>
     public class Connection
     {
-        internal static int MaxMessageSize { get; set; } =  64 * 1024; //x KiB
+        internal static int MaxMessageSize { get; set; } = 64 * 1024; //x KiB
         static string messageToBig = "The message exceeds the maximum allowed message size: {0} bytes.";
 
         WebSocket socket;
@@ -59,7 +59,7 @@ namespace WebSocketRPC
         /// <summary>
         /// Gets the cookie collection.
         /// </summary>
-        public IReadOnlyDictionary<string, string> Cookies { get; private set;  }
+        public IReadOnlyDictionary<string, string> Cookies { get; private set; }
 
         /// <summary>
         /// Message receive event. Args: message, is text message.
@@ -81,27 +81,6 @@ namespace WebSocketRPC
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="data">Binary data to send.</param>
-        /// <returns>True if the operation was successful, false otherwise.</returns>
-        public async Task<bool> SendAsync(ArraySegment<byte> data)
-        {
-            if (socket.State != WebSocketState.Open)
-                return false;
-
-            if (data.Count >= MaxMessageSize)
-            {
-                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
-                return false;
-            }
-
-            Debug.WriteLine("Sending binary data.");
-            await sendTaskQueue.Enqueue(() => sendAsync(data, WebSocketMessageType.Binary));
-            return true;
-        }
-
-        /// <summary>
-        /// Sends the specified data.
-        /// </summary>
         /// <param name="data">Text data to send.</param>
         /// <param name="e">String encoding.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
@@ -119,17 +98,21 @@ namespace WebSocketRPC
             }
 
             Debug.WriteLine("Sending: " + data);
+            //sendAsync(segment, WebSocketMessageType.Text).Wait();
             await sendTaskQueue.Enqueue(() => sendAsync(segment, WebSocketMessageType.Text));
             return true;
         }
 
         async Task sendAsync(ArraySegment<byte> data, WebSocketMessageType msgType)
         {
+            if (socket.State != WebSocketState.Open)
+                return;
+
             try
             {
                 await socket.SendAsync(data, msgType, true, CancellationToken.None);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (socket.State != WebSocketState.Open)
                     await CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
@@ -161,31 +144,30 @@ namespace WebSocketRPC
         /// <summary>
         /// Listens for the receive messages for the specified connection.
         /// </summary>
-        /// <param name="connection">Connection.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>Task.</returns>
-        internal static async Task ListenReceiveAsync(Connection connection, CancellationToken token)
+        internal async Task ListenReceiveAsync(CancellationToken token)
         {
-            var webSocket = connection.socket;
-            using (var registration = token.Register(() => connection.CloseAsync().Wait()))
+            using (var registration = token.Register(() => CloseAsync().Wait()))
             {
                 try
                 {
-                    connection.OnOpen?.Invoke();
-                    byte[] receiveBuffer = new byte[RPCSettings.MaxMessageSize];
-                    
-                    while (webSocket.State == WebSocketState.Open)
+                    OnOpen?.Invoke();
+                    byte[] receiveBuffer = new byte[MaxMessageSize];
+
+                    while (socket.State == WebSocketState.Open)
                     {
                         WebSocketReceiveResult receiveResult = null;
                         var count = 0;
                         do
                         {
-                            receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                            var segment = new ArraySegment<byte>(receiveBuffer, count, MaxMessageSize - count);
+                            receiveResult = await socket.ReceiveAsync(segment, CancellationToken.None);
                             count += receiveResult.Count;
 
                             if (count >= MaxMessageSize)
                             {
-                                await connection.CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
+                                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
                                 return;
                             }
                         }
@@ -194,12 +176,12 @@ namespace WebSocketRPC
 
                         if (receiveResult.MessageType == WebSocketMessageType.Close)
                         {
-                            await connection.CloseAsync();
+                            await CloseAsync();
                         }
                         else
                         {
                             Debug.WriteLine("Received: " + new ArraySegment<byte>(receiveBuffer, 0, count).ToString(Encoding.ASCII));
-                            connection.OnReceive?.Invoke(new ArraySegment<byte>(receiveBuffer, 0, count), receiveResult.MessageType == WebSocketMessageType.Text);
+                            OnReceive?.Invoke(new ArraySegment<byte>(receiveBuffer, 0, count), receiveResult.MessageType == WebSocketMessageType.Text);
                         }
 
                         if (token.IsCancellationRequested)
@@ -208,8 +190,8 @@ namespace WebSocketRPC
                 }
                 catch (Exception ex)
                 {
-                    connection.OnError?.Invoke(ex);
-                    await connection.CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
+                    OnError?.Invoke(ex);
+                    await CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
                     //socket will be aborted -> no need to close manually
                 }
             }
@@ -232,3 +214,4 @@ namespace WebSocketRPC
         }
     }
 }
+

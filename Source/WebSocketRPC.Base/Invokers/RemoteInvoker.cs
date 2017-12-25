@@ -30,6 +30,8 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace WebSocketRPC
 {
@@ -38,16 +40,17 @@ namespace WebSocketRPC
         static HashSet<Type> verifiedTypes = new HashSet<Type>();
 
         Func<Request, Task> sendAsync;
-        Dictionary<string, TaskCompletionSource<Response>> runningMethods;
+        ConcurrentDictionary<string, TaskCompletionSource<Response>> runningMethods;
+        ConcurrentDictionary<string, SemaphoreSlim> methodConcurencySyncs;
 
         public RemoteInvoker()
         {
-            runningMethods = new Dictionary<string, TaskCompletionSource<Response>>();
+            runningMethods = new ConcurrentDictionary<string, TaskCompletionSource<Response>>();
+            methodConcurencySyncs = new ConcurrentDictionary<string, SemaphoreSlim>();
             if (verifiedTypes.Contains(typeof(TInterface))) return;
 
             //verify constraints
             verifyType();
-
             //cache it
             verifiedTypes.Add(typeof(TInterface));  
         }
@@ -58,11 +61,6 @@ namespace WebSocketRPC
                 throw new Exception("The specified type must be an interface type.");
 
             var methodList = typeof(TInterface).GetMethods(BindingFlags.Public | BindingFlags.Instance);
-
-            var asyncFuncs = methodList.Where(x => x.ReturnType.IsAssignableFrom(typeof(Task)));
-            if (asyncFuncs.Any())
-                throw new NotSupportedException("Functions returning Task are not supported: " + String.Join(", ", asyncFuncs.Select(x => x.Name)) +
-                                                ". Declare them as non async ones in the interface contract.");
 
             var propertyList = typeof(TInterface).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             if (propertyList.Any())
@@ -77,10 +75,13 @@ namespace WebSocketRPC
 
         public void Receive(Response response)
         {
-            if (runningMethods.ContainsKey(response.FunctionName) == false)
-                return;
+            var key = response.FunctionName + "-" + response.CallIndex;
 
-            runningMethods[response.FunctionName].SetResult(response);
+            lock (runningMethods)
+            {
+                if (runningMethods.ContainsKey(key))
+                    runningMethods[key].SetResult(response);
+            }
         }
 
 
@@ -126,24 +127,38 @@ namespace WebSocketRPC
             return result;
         }
 
+        ConcurrentDictionary<string, int> callIndex = new ConcurrentDictionary<string, int>();
         async Task<Response> invokeAsync(string name, params object[] args)
         {
             if (sendAsync == null)
                 throw new Exception("The invoker is not initialized.");
 
+            //Console.WriteLine("Queue: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
+            //methodConcurencySyncs.GetOrAdd(name, new SemaphoreSlim(1));
+            //await methodConcurencySyncs[name].WaitAsync(); //wait for the previous task (functions with the same name are run sequentially)
+
             var msg = new Request
             {
                 FunctionName = name,
+                CallIndex = callIndex.AddOrUpdate(name, 0, (k, v) => v + 1),
                 Arguments = args.Select(a => JToken.FromObject(a, RPCSettings.Serializer)).ToArray()
             };
 
-            runningMethods[name] = new TaskCompletionSource<Response>();
+            //Console.WriteLine("Invoking: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
+            var key = msg.FunctionName + "-" + msg.CallIndex;
+
+            runningMethods[key] = new TaskCompletionSource<Response>();
             await sendAsync(msg);
-            await runningMethods[name].Task;
+            await runningMethods[key].Task;
 
-            var response = runningMethods[name].Task.Result;
-            runningMethods.Remove(name);
+            var response = runningMethods[key].Task.Result;
+            runningMethods.TryRemove(key, out TaskCompletionSource<Response> _);
 
+            //Console.WriteLine("End invoke: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
+
+            key = msg.FunctionName + "-" + msg.CallIndex;
+            callIndex.TryRemove(key, out int _);
+            //methodConcurencySyncs[name].Release();
             return response;
         }
 

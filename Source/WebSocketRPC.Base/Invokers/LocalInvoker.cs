@@ -29,7 +29,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NameInfoPairs = System.Collections.Generic.Dictionary<string, System.Reflection.MethodInfo>;
 
@@ -42,7 +41,7 @@ namespace WebSocketRPC
 
         public LocalInvoker()
         {
-            cache.TryGetValue(typeof(TObj), out methods);
+            lock(cache) cache.TryGetValue(typeof(TObj), out methods);
             if (methods != null) return;
 
             var methodList = typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -52,7 +51,7 @@ namespace WebSocketRPC
 
             //initialize and cache it
             methods = methodList.ToDictionary(x => x.Name, x => x);
-            cache[typeof(TObj)] = methods;
+            lock(cache) cache[typeof(TObj)] = methods;
         }
 
         static void verifyType(MethodInfo[] methodList)
@@ -89,7 +88,13 @@ namespace WebSocketRPC
                 error = ex;
             }
 
-            return new Response { FunctionName = clientMessage.FunctionName, ReturnValue = result, Error = error?.Message };
+            return new Response
+            {
+                FunctionName = clientMessage.FunctionName,
+                CallIndex = clientMessage.CallIndex,
+                ReturnValue = result,
+                Error = error?.Message
+            };
         }
 
         async Task<JToken> invokeAsync(TObj obj, string functionName, JToken[] args)

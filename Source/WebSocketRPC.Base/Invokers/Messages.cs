@@ -32,6 +32,7 @@ namespace WebSocketRPC
     struct Request
     {
         public string FunctionName;
+        public int CallIndex;
         public JToken[] Arguments;
 
         public static Request FromJson(string json)
@@ -43,7 +44,8 @@ namespace WebSocketRPC
             var r = new Request
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                Arguments = root[nameof(Arguments)]?.Children().ToArray()
+                CallIndex    = root[nameof(CallIndex)]?.Value<int>() ?? 0,
+                Arguments    = root[nameof(Arguments)]?.Children().ToArray()
             };
 
             if (r.FunctionName == null || r.Arguments == null)
@@ -63,6 +65,7 @@ namespace WebSocketRPC
     struct Response
     {
         public string FunctionName;
+        public int CallIndex;
         public JToken ReturnValue;
         public string Error;
 
@@ -75,8 +78,9 @@ namespace WebSocketRPC
             var r = new Response
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                ReturnValue = root[nameof(ReturnValue)]?.Value<JToken>(),
-                Error = root[nameof(Error)]?.Value<string>()
+                CallIndex    = root[nameof(CallIndex)]?.Value<int>() ?? 0,
+                ReturnValue  = root[nameof(ReturnValue)]?.Value<JToken>(),
+                Error        = root[nameof(Error)]?.Value<string>()
             };
 
             if (r.FunctionName == null || r.ReturnValue == null)

@@ -85,7 +85,7 @@ namespace WebSocketRPC
         /// <returns>Binders.</returns>
         public static IEnumerable<IRemoteBinder<TInterface>> For<TInterface>()
         {
-            return AllBinders.OfType<IRemoteBinder<TInterface>>(); 
+            return AllBinders.ToArray().OfType<IRemoteBinder<TInterface>>(); 
         }
 
         /// <summary>
@@ -98,7 +98,8 @@ namespace WebSocketRPC
         {
             var lBinderType = typeof(ILocalBinder<>).MakeGenericType(obj.GetType());
 
-            var binders = AllBinders.OfType<IRemoteBinder<TInterface>>()
+            var binders = AllBinders.ToArray() // prevent 'Collection was modified'
+                                    .OfType<IRemoteBinder<TInterface>>()
                                     .Where(x =>
                                     {
                                         var xType = x.GetType();

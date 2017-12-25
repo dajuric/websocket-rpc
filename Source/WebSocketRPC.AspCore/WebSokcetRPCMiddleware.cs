@@ -46,7 +46,7 @@ namespace WebSocketRPC
             try
             {
                 onConnect(context, connection);
-                await Connection.ListenReceiveAsync(connection, CancellationToken.None);
+                await connection.ListenReceiveAsync(CancellationToken.None);
             }
             finally
             {

@@ -12,11 +12,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)ClientServer\ArraySegmentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientServer\Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientServer\Connection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\Base\Binder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\Base\IBinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\LocalBinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\LocalRemoteBinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionBinders\RemoteBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Features\TimeoutBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\Base\Binder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\Base\IBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\LocalBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\LocalRemoteBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\RemoteBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\LocalInvoker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\Messages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\RemoteInvoker.cs" />

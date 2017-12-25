@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -55,11 +56,11 @@ namespace WebSocketRPC
         /// <param name="port">The http/https URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <param name="onHttpRequest">Action executed on HTTP request.</param>
+        /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
         /// <returns>Server task.</returns>
-        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Action<HttpListenerRequest, HttpListenerResponse> onHttpRequest)
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
         {
-            await ListenAsync($"http://+:{port}/", token, onConnect, onHttpRequest);
+            await ListenAsync($"http://+:{port}/", token, onConnect, onHttpRequestAsync);
         }
 
 
@@ -76,6 +77,7 @@ namespace WebSocketRPC
             await ListenAsync(httpListenerPrefix, token, onConnect, (rq, rp) => 
             {
                 rp.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Task.FromResult(true);
             });
         }
 
@@ -86,9 +88,9 @@ namespace WebSocketRPC
         /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <param name="onHttpRequest">Action executed on HTTP request.</param>
+        /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
         /// <returns>Server task.</returns>
-        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Action<HttpListenerRequest, HttpListenerResponse> onHttpRequest)
+        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
         {
             var listener = new HttpListener();
             listener.Prefixes.Add(httpListenerPrefix);
@@ -97,27 +99,24 @@ namespace WebSocketRPC
             catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
             {
                 throw new UnauthorizedAccessException($"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
-                                                      $"Please run (elevated): 'netsh add urlacl url={httpListenerPrefix} user=\"Everyone\"'.");
+                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'.");
             }
 
-            ///using (var r = token.Register(() => listener.Stop()))
+			//helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks
+			//         https://github.com/NancyFx/Nancy/blob/815b6fdf42a5a8c61e875501e305382f46cec619/src/Nancy.Hosting.Self/HostConfiguration.cs
+            using (var r = token.Register(() => closeListener(listener)))
             {
                 bool shouldStop = false;
                 while (!shouldStop)
                 {
                     try
                     {
-                        HttpListenerContext ctx = await listener.GetContextAsync();
+                        var ctx = await listener.GetContextAsync();
 
                         if (ctx.Request.IsWebSocketRequest)
-                        {
-                            listenAsync(ctx, token, onConnect).Wait(0);
-                        }
+                            Task.Run(() => listenAsync(ctx, token, onConnect)).Wait(0);
                         else
-                        {
-                            onHttpRequest(ctx.Request, ctx.Response);
-                            ctx.Response.Close();
-                        }
+                            Task.Factory.StartNew(() => listenHttpAsync(ctx, onHttpRequestAsync), TaskCreationOptions.LongRunning).Wait(0);
                     }
                     catch (Exception)
                     {
@@ -131,8 +130,29 @@ namespace WebSocketRPC
                     }
                 }
             }
+
+            Console.WriteLine("Server stopped.");
         }
 
+        static void closeListener(HttpListener listener)
+        {
+            var wsCloseTasks = new Task[connections.Count];
+
+            for (int i = 0; i < connections.Count; i++)
+                wsCloseTasks[i] = connections[i].CloseAsync();
+
+            Task.WaitAll(wsCloseTasks);
+            listener.Stop();
+            connections.Clear();
+        }
+
+        static async Task listenHttpAsync(HttpListenerContext ctx, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequest)
+        {
+            await onHttpRequest(ctx.Request, ctx.Response);
+            ctx.Response.Close();
+        }
+
+        static List<Connection> connections = new List<Connection>();
         static async Task listenAsync(HttpListenerContext ctx, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
             if (!ctx.Request.IsWebSocketRequest)
@@ -155,12 +175,16 @@ namespace WebSocketRPC
             var connection = new Connection(webSocket, CookieUtils.GetCookies(wsCtx.CookieCollection));
             try
             {
+                lock (connections) connections.Add(connection);
                 onConnect(connection, wsCtx);
-                await Connection.ListenReceiveAsync(connection, token);
+                await connection.ListenReceiveAsync(token);
             }
+            catch (Exception ex)
+            { }
             finally
             {
                 webSocket?.Dispose();
+                lock (connections) connections.Remove(connection);
             }
         }
     }
