@@ -58,7 +58,7 @@ namespace WebSocketRPC
         {
             //check constraints
             if (typeof(TObj).IsInterface)
-                throw new Exception("The specified type must be a class.");
+                throw new Exception("The specified type must be a class or struct.");
 
             var overloadedMethodNames = methodList.GroupBy(x => x.Name)
                                                   .DefaultIfEmpty()
@@ -70,7 +70,7 @@ namespace WebSocketRPC
 
             var propertyList = typeof(TObj).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             if (propertyList.Any())
-                throw new NotSupportedException("The class must not declare any properties: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
+                throw new NotSupportedException("Properties are not permitted: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
         }
 
         public async Task<Response> InvokeAsync(TObj obj, Request clientMessage)
@@ -91,7 +91,7 @@ namespace WebSocketRPC
             return new Response
             {
                 FunctionName = clientMessage.FunctionName,
-                CallIndex = clientMessage.CallIndex,
+                CallId = clientMessage.CallId,
                 ReturnValue = result,
                 Error = error?.Message
             };

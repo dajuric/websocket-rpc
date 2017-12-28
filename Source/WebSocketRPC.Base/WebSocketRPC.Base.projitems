@@ -16,7 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\Base\Binder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\Base\IBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\LocalBinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\LocalRemoteBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RpcBinders\RemoteBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\LocalInvoker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\Messages.cs" />

@@ -180,8 +180,9 @@ namespace WebSocketRPC
                         }
                         else
                         {
-                            Debug.WriteLine("Received: " + new ArraySegment<byte>(receiveBuffer, 0, count).ToString(Encoding.ASCII));
-                            OnReceive?.Invoke(new ArraySegment<byte>(receiveBuffer, 0, count), receiveResult.MessageType == WebSocketMessageType.Text);
+                            var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
+                            OnReceive?.Invoke(segment, receiveResult.MessageType == WebSocketMessageType.Text);
+                            Debug.WriteLine("Received: " + segment.ToString(RPCSettings.Encoding));
                         }
 
                         if (token.IsCancellationRequested)
@@ -201,7 +202,7 @@ namespace WebSocketRPC
         /// Invokes the error event.
         /// </summary>
         /// <param name="ex">Exception.</param>
-        internal void InvokeErrorAsync(Exception ex)
+        internal void InvokeError(Exception ex)
         {
             OnError?.Invoke(ex);
         }

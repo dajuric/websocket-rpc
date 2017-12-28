@@ -42,18 +42,7 @@ namespace WebSocketRPC
         /// </summary>
         internal static readonly List<IBinder> AllBinders = new List<IBinder>();
 
-        /// <summary>
-        /// Creates two-way RPC receiving-sending binding for the provided connection.
-        /// </summary>
-        /// <typeparam name="TObj">Object type.</typeparam>
-        /// <typeparam name="TInterface">Interface type.</typeparam>
-        /// <param name="connection">Existing connection to bind to.</param>
-        /// <param name="obj">Object to bind to.</param>
-        /// <returns>Binder.</returns>
-        public static IBinder Bind<TObj, TInterface>(this Connection connection, TObj obj)
-        { 
-            return new LocalRemoteBinder<TObj, TInterface>(connection, obj);
-        }
+        #region Bind
 
         /// <summary>
         /// Creates one way RPC receiving binding for the provided connection.
@@ -62,8 +51,11 @@ namespace WebSocketRPC
         /// <param name="connection">Existing connection to bind to.</param>
         /// <param name="obj">Object to bind to.</param>
         /// <returns>Binder.</returns>
-        public static IBinder Bind<TObj>(this Connection connection, TObj obj)
-        {
+        public static ILocalBinder<TObj> Bind<TObj>(this Connection connection, TObj obj)
+        { 
+            if (AllBinders.ToArray().OfType<ILocalBinder<TObj>>().Any(x => x.Connection == connection))
+                throw new NotSupportedException("Only one local binder is permitted.");
+
             return new LocalBinder<TObj>(connection, obj);
         }
 
@@ -73,13 +65,44 @@ namespace WebSocketRPC
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
         /// <returns>Binder.</returns>
-        public static IBinder Bind<TInterface>(this Connection connection)
+        public static IRemoteBinder<TInterface> Bind<TInterface>(this Connection connection)
         {
+            if (AllBinders.ToArray().OfType<IRemoteBinder<TInterface>>().Any(x => x.Connection == connection))
+                throw new NotSupportedException("Only one remote binder is permitted.");
+
             return new RemoteBinder<TInterface>(connection);
         }
 
         /// <summary>
-        /// Gets all two-way or one-way remote binders.
+        /// Creates two way RPC sending binding for the provided connection.
+        /// <para>Shorthand for binding local and remote binder separately.</para>
+        /// </summary>
+        /// <typeparam name="TInterface">Interface type.</typeparam>
+        /// <param name="connection">Existing connection to bind to.</param>
+        /// <returns>Loca and remote binder.</returns>
+        public static (ILocalBinder<TObj>, IRemoteBinder<TInterface>) Bind<TObj, TInterface>(this Connection connection, TObj obj)
+        {
+            return (connection.Bind(obj), connection.Bind<TInterface>());
+        }
+
+        #endregion
+
+
+        #region For
+
+        /// <summary>
+        /// Gets all the binders associated with the specified connection.
+        /// </summary>
+        /// <param name="connection">Connection.</param>
+        /// <returns>Binders associated with the connection.</returns>
+        public static IEnumerable<IBinder> For(Connection connection)
+        {
+            return AllBinders.ToArray()
+                             .Where(x => x.Connection == connection);
+        }
+
+        /// <summary>
+        /// Gets all one-way remote binders.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <returns>Binders.</returns>
@@ -89,42 +112,38 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Gets all two-way binders associated with the specified object.
+        /// Gets all remote binders which connection also have local binder(s) associated with the specified object.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="obj">Target object.</param>
-        /// <returns>Binders.</returns>
+        /// <returns>Remote binders.</returns>
         public static IEnumerable<IRemoteBinder<TInterface>> For<TInterface>(object obj)
         {
             var lBinderType = typeof(ILocalBinder<>).MakeGenericType(obj.GetType());
+            var lObjBinders = AllBinders.ToArray() // prevent 'Collection was modified'
+                                        .Where(x =>
+                                        {
+                                            var xType = x.GetType();
 
-            var binders = AllBinders.ToArray() // prevent 'Collection was modified'
-                                    .OfType<IRemoteBinder<TInterface>>()
-                                    .Where(x =>
-                                    {
-                                        var xType = x.GetType();
+                                            var isLocalBinder = lBinderType.IsAssignableFrom(xType);
+                                            if (!isLocalBinder) return false;
 
-                                        var isLocalBinder = lBinderType.IsAssignableFrom(xType);
-                                        if (!isLocalBinder) return false;
+                                            var isObjBinder = xType.GetProperty(nameof(ILocalBinder<object>.Object)).GetValue(x, null) == obj;
+                                            return isObjBinder;
+                                        });
 
-                                        var isObjBinder = xType.GetProperty(nameof(ILocalBinder<object>.Object)).GetValue(x, null) == obj;
-                                        return isObjBinder;
-                                    });
 
-            return binders;
+            var rObjBinders = AllBinders.ToArray() // prevent 'Collection was modified'
+                                        .OfType<IRemoteBinder<TInterface>>()
+                                        .Where(rb => lObjBinders.Any(lb => lb.Connection == rb.Connection));
+
+            return rObjBinders;
         }
 
-        /// <summary>
-        /// Gets whether the data contain RPC message or not.
-        /// </summary>
-        /// <param name="data">Received data.</param>
-        /// <returns>True if the data contain RPC message, false otherwise.</returns>
-        public static bool IsRpcMessage(this ArraySegment<byte> data)
-        {
-            var str = data.ToString(Encoding.ASCII);
-            return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
-        }
+        #endregion
 
+
+        #region Call
 
         /// <summary>
         /// Calls the remote method.
@@ -213,5 +232,22 @@ namespace WebSocketRPC
 
             return results;
         }
+
+        #endregion
+
+        #region Misc
+
+        public static int ConnectionCount
+        {
+            get
+            {
+                return AllBinders.ToArray()
+                                 .Select(x => x.Connection)
+                                 .Distinct()
+                                 .Count();
+            }
+        }
+
+        #endregion
     }
 }

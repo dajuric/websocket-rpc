@@ -25,6 +25,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -43,10 +45,12 @@ namespace WebSocketRPC
         /// <param name="port">The http/https URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
+        /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
         /// <returns>Server task.</returns>
-        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, bool useHttps = false)
         {
-            await ListenAsync($"http://+:{port}/", token, onConnect);
+            var s = useHttps ? "s" : String.Empty;
+            await ListenAsync($"http{s}://+:{port}/", token, onConnect);
         }
 
         /// <summary>
@@ -57,10 +61,12 @@ namespace WebSocketRPC
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
+        /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
         /// <returns>Server task.</returns>
-        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, bool useHttps = false)
         {
-            await ListenAsync($"http://+:{port}/", token, onConnect, onHttpRequestAsync);
+            var s = useHttps ? "s" : String.Empty;
+            await ListenAsync($"http{s}://+:{port}/", token, onConnect, onHttpRequestAsync);
         }
 
 
@@ -99,7 +105,7 @@ namespace WebSocketRPC
             catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
             {
                 throw new UnauthorizedAccessException($"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
-                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'.");
+                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'.", ex);
             }
 
 			//helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks
@@ -131,7 +137,7 @@ namespace WebSocketRPC
                 }
             }
 
-            Console.WriteLine("Server stopped.");
+            Debug.WriteLine("Server stopped.");
         }
 
         static void closeListener(HttpListener listener)
@@ -141,7 +147,7 @@ namespace WebSocketRPC
             for (int i = 0; i < connections.Count; i++)
                 wsCloseTasks[i] = connections[i].CloseAsync();
 
-            Task.WaitAll(wsCloseTasks);
+            Task.WaitAll(wsCloseTasks.Where(t => t != null).ToArray());
             listener.Stop();
             connections.Clear();
         }
@@ -180,7 +186,9 @@ namespace WebSocketRPC
                 await connection.ListenReceiveAsync(token);
             }
             catch (Exception ex)
-            { }
+            {
+                 connection.InvokeError(ex);
+            }
             finally
             {
                 webSocket?.Dispose();

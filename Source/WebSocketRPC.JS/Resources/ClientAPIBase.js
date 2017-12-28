@@ -42,7 +42,7 @@ function onCallRequest(data, onError)
 
     var r = obj[jsonFName].apply(obj, data.Arguments);
     if (r === undefined) r = true;
-    ws.send(JSON.stringify({ FunctionName: data.FunctionName, ReturnValue: r }));
+    ws.send(JSON.stringify({ FunctionName: data.FunctionName, CallId: data.CallId, ReturnValue: r })); //TODO: error ?
 }
 
 function getAllFunctions(obj)

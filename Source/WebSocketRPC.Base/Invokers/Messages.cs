@@ -25,6 +25,7 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
 
 namespace WebSocketRPC
@@ -32,7 +33,7 @@ namespace WebSocketRPC
     struct Request
     {
         public string FunctionName;
-        public int CallIndex;
+        public string CallId;
         public JToken[] Arguments;
 
         public static Request FromJson(string json)
@@ -44,7 +45,7 @@ namespace WebSocketRPC
             var r = new Request
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                CallIndex    = root[nameof(CallIndex)]?.Value<int>() ?? 0,
+                CallId       = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
                 Arguments    = root[nameof(Arguments)]?.Children().ToArray()
             };
 
@@ -65,7 +66,7 @@ namespace WebSocketRPC
     struct Response
     {
         public string FunctionName;
-        public int CallIndex;
+        public string CallId;
         public JToken ReturnValue;
         public string Error;
 
@@ -78,7 +79,7 @@ namespace WebSocketRPC
             var r = new Response
             {
                 FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                CallIndex    = root[nameof(CallIndex)]?.Value<int>() ?? 0,
+                CallId       = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
                 ReturnValue  = root[nameof(ReturnValue)]?.Value<JToken>(),
                 Error        = root[nameof(Error)]?.Value<string>()
             };

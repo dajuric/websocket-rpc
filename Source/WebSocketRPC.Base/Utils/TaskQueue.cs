@@ -15,6 +15,7 @@ namespace WebSocketRPC
 
         public async Task Enqueue(Func<Task> func)
         {
+            Interlocked.Increment(ref count);
             await semaphore.WaitAsync();
             try
             {
@@ -22,9 +23,13 @@ namespace WebSocketRPC
             }
             finally
             {
+                Interlocked.Decrement(ref count);
                 semaphore.Release();
             }
         }
+
+        int count = 0;
+        public int Count => count;
 
         ~TaskQueue()
         {

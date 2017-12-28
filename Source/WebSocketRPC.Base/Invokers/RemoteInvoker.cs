@@ -41,12 +41,10 @@ namespace WebSocketRPC
 
         Func<Request, Task> sendAsync;
         ConcurrentDictionary<string, TaskCompletionSource<Response>> runningMethods;
-        ConcurrentDictionary<string, SemaphoreSlim> methodConcurencySyncs;
 
         public RemoteInvoker()
         {
             runningMethods = new ConcurrentDictionary<string, TaskCompletionSource<Response>>();
-            methodConcurencySyncs = new ConcurrentDictionary<string, SemaphoreSlim>();
             if (verifiedTypes.Contains(typeof(TInterface))) return;
 
             //verify constraints
@@ -75,7 +73,7 @@ namespace WebSocketRPC
 
         public void Receive(Response response)
         {
-            var key = response.FunctionName + "-" + response.CallIndex;
+            var key = response.FunctionName + "-" + response.CallId;
 
             lock (runningMethods)
             {
@@ -127,25 +125,19 @@ namespace WebSocketRPC
             return result;
         }
 
-        ConcurrentDictionary<string, int> callIndex = new ConcurrentDictionary<string, int>();
         async Task<Response> invokeAsync(string name, params object[] args)
         {
             if (sendAsync == null)
                 throw new Exception("The invoker is not initialized.");
 
-            //Console.WriteLine("Queue: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
-            //methodConcurencySyncs.GetOrAdd(name, new SemaphoreSlim(1));
-            //await methodConcurencySyncs[name].WaitAsync(); //wait for the previous task (functions with the same name are run sequentially)
-
             var msg = new Request
             {
                 FunctionName = name,
-                CallIndex = callIndex.AddOrUpdate(name, 0, (k, v) => v + 1),
+                CallId = Guid.NewGuid().ToString(),
                 Arguments = args.Select(a => JToken.FromObject(a, RPCSettings.Serializer)).ToArray()
             };
 
-            //Console.WriteLine("Invoking: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
-            var key = msg.FunctionName + "-" + msg.CallIndex;
+            var key = msg.FunctionName + "-" + msg.CallId;
 
             runningMethods[key] = new TaskCompletionSource<Response>();
             await sendAsync(msg);
@@ -153,12 +145,6 @@ namespace WebSocketRPC
 
             var response = runningMethods[key].Task.Result;
             runningMethods.TryRemove(key, out TaskCompletionSource<Response> _);
-
-            //Console.WriteLine("End invoke: " + name + " Task: " + Thread.CurrentThread.ManagedThreadId);
-
-            key = msg.FunctionName + "-" + msg.CallIndex;
-            callIndex.TryRemove(key, out int _);
-            //methodConcurencySyncs[name].Release();
             return response;
         }
 

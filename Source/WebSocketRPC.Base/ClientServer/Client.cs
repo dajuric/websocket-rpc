@@ -59,7 +59,7 @@ namespace WebSocketRPC
                 {
                     isClosedSuccessfully = await connectAsync(uri, token, onConnect, setOptions);
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     isClosedSuccessfully = false;
                     if (!reconnectOnError && !reconnectOnClose) throw;
@@ -86,7 +86,7 @@ namespace WebSocketRPC
                 setOptions?.Invoke(webSocket.Options);
                 await webSocket.ConnectAsync(new Uri(uri), token);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 webSocket?.Dispose();
                 throw;
@@ -98,8 +98,6 @@ namespace WebSocketRPC
                 onConnection(connection);
                 await connection.ListenReceiveAsync(token);
             }
-            catch (Exception ex)
-            { }
             finally
             {
                 isClosedSuccessfully = webSocket.State != WebSocketState.Aborted;
@@ -109,6 +107,5 @@ namespace WebSocketRPC
             return isClosedSuccessfully;
         }
 
-       
     }
 }
