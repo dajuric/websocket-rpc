@@ -120,9 +120,9 @@ namespace WebSocketRPC
                         var ctx = await listener.GetContextAsync();
 
                         if (ctx.Request.IsWebSocketRequest)
-                            Task.Run(() => listenAsync(ctx, token, onConnect)).Wait(0);
+                            Task.Factory.StartNew(() => listenAsync(ctx, token, onConnect),       TaskCreationOptions.LongRunning).Wait(0);
                         else
-                            Task.Factory.StartNew(() => listenHttpAsync(ctx, onHttpRequestAsync), TaskCreationOptions.LongRunning).Wait(0);
+                            Task.Factory.StartNew(() => listenHttpAsync(ctx, onHttpRequestAsync), TaskCreationOptions.None).Wait(0);
                     }
                     catch (Exception)
                     {
