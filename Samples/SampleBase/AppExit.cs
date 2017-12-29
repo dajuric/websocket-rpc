@@ -35,7 +35,6 @@ namespace SampleBase
         {
             try
             {
-                //wait for the competition
                 foreach (var t in tasks) //enables exception handling
                     t.Wait();
             }

@@ -35,5 +35,5 @@ The recommendation is to run samples in the following order (from the more simpl
     *Server has reporting service initiatted and stopped on the client's request.*
 
 **Remarks**  
-+ If a sample contains JavaScript client, an additional step requires opening the included *'Index.html'*.
++ If a sample contains JavaScript client, open the corresponding *'Index.html'*.
 + Samples that contain multiple executables have *'Run.bat'* for one-click run.

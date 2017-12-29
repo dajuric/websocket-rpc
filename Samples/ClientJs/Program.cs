@@ -44,7 +44,7 @@ namespace ClientJs
 
     class Program
     {
-        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'ocalhost', add for public address)
+        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'localhost', add for public address)
         //open Index.html to run the client
         static void Main(string[] args)
         {

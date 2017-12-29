@@ -12,7 +12,7 @@ namespace RawMsgJs
 
     class Program
     {
-        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'ocalhost', add for public address)
+        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'localhost', add for public address)
         //open Index.html to run the client
         static void Main(string[] args)
         {
@@ -37,6 +37,7 @@ namespace RawMsgJs
                 {
                     var txt = msg.ToString(RPCSettings.Encoding);
                     Console.WriteLine("Received: " + txt);
+
                     await c.SendAsync("Server received: " + txt, RPCSettings.Encoding);
 
                     if (txt.ToLower() == "close")
