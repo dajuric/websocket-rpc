@@ -79,26 +79,57 @@ namespace WebSocketRPC
         public event Action<Exception> OnError;
 
         /// <summary>
-        /// Sends the specified data.
+        /// Sends the specified data as the binary message type.
+        /// </summary>
+        /// <param name="data">Text data to send.</param>
+        /// <param name="e">String encoding.</param>
+        /// <returns>True if the operation was successful, false otherwise.</returns>
+        public async Task<bool> SendAsync(byte[] data)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data), "The provided data must not be null.");
+
+            if (socket.State != WebSocketState.Open)
+                return false;
+    
+            if (data.Length >= MaxMessageSize)
+            {
+                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
+                return false;
+            }
+
+            Debug.WriteLine("Sending binary data.");
+            var segment = new ArraySegment<byte>(data, 0, data.Length);
+            await sendTaskQueue.Enqueue(() => sendAsync(segment, WebSocketMessageType.Binary));
+            return true;
+        }
+
+        /// <summary>
+        /// Sends the specified data as the text message type.
         /// </summary>
         /// <param name="data">Text data to send.</param>
         /// <param name="e">String encoding.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
         public async Task<bool> SendAsync(string data, Encoding e)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data), "The provided tet must not be null.");
+
+            if (e == null)
+                throw new ArgumentNullException(nameof(e), "The provided encoding must not be null.");
+
             if (socket.State != WebSocketState.Open)
                 return false;
 
             var bData = e.GetBytes(data);
-            var segment = new ArraySegment<byte>(bData, 0, bData.Length);
-            if (segment.Count >= MaxMessageSize)
+            if (bData.Length >= MaxMessageSize)
             {
                 await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
                 return false;
             }
 
             Debug.WriteLine("Sending: " + data);
-            //sendAsync(segment, WebSocketMessageType.Text).Wait();
+            var segment = new ArraySegment<byte>(bData, 0, bData.Length);
             await sendTaskQueue.Enqueue(() => sendAsync(segment, WebSocketMessageType.Text));
             return true;
         }
