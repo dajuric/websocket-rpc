@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
+    </PropertyGroup>
+	
+	<PropertyGroup>
+		<OutputPath>bin\</OutputPath>
+		<ApplicationIcon />
+		<OutputType>Exe</OutputType>
+		<StartupObject />
+
+    <DocumentationFile>bin\$(TargetFramework)\ServerClientJs.xml</DocumentationFile>
+  </PropertyGroup>
+	
+	<ItemGroup>
+	  <None Remove="Site\LocalAPI.js" />
+	</ItemGroup>
+  
+    <ItemGroup>
+      <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj" />
+      <ProjectReference Include="..\..\Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <None Update="Site\Index.html">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+</Project>

@@ -62,7 +62,7 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Gets or sets the maximum message size [1..inf].
+        /// Gets or sets the maximum message size in bytes [1..Int32.MaxValue].
         /// </summary>
         public static int MaxMessageSize
         {

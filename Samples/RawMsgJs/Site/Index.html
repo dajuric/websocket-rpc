@@ -1,0 +1,52 @@
+﻿<html>
+    <head>
+        <script src="MessagingAPI.js"></script>
+    </head>
+
+    <body>
+        <p>Send/receive messages. Message is sent when the text box loses the focus.</p>
+        <hr />
+
+        <label>Message: </label> <input type="text" id="msg" onblur="onRequest(this)" disabled/>
+        
+        <p>Responses:</p>
+        <div id="responses"></div>
+
+        <script>
+            function onConnect()
+            {
+                var elem = document.getElementById("msg");
+                elem.disabled = false;
+            }
+
+            function onRequest(elem)
+            {
+                api.send(elem.value);
+                elem.value = "";
+            }
+
+            function onResponse(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.createElement('p');
+                p.innerHTML = msg;
+                p.style.color = color;
+
+                var lst = document.getElementById("responses");
+                lst.appendChild(p);
+            }
+
+            function writeMsg(jsonMsg, color)
+            {
+                onResponse(JSON.stringify(jsonMsg, null, "\t"), color);
+            }
+
+            //init API
+            var api = new MessagingAPI("ws://localhost:8001");
+            api.onOtherMessage = onResponse;
+            api.connect(onConnect, err => writeMsg(err, 'red'), msg => writeMsg(msg, 'green')); //onConnect, onError, onClose
+        </script>
+
+    </body>
+</html>

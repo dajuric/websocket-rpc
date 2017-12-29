@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace WebSocketRPC
@@ -235,8 +234,12 @@ namespace WebSocketRPC
 
         #endregion
 
+
         #region Misc
 
+        /// <summary>
+        /// Gets the connection count.
+        /// </summary>
         public static int ConnectionCount
         {
             get
@@ -246,6 +249,17 @@ namespace WebSocketRPC
                                  .Distinct()
                                  .Count();
             }
+        }
+
+        /// <summary>
+        /// Gets whether the data contain RPC message or not.
+        /// </summary>
+        /// <param name="data">Received data.</param>
+        /// <returns>True if the data contain RPC message, false otherwise.</returns>
+        public static bool IsRpcMessage(this ArraySegment<byte> data)
+        {
+            var str = data.ToString(RPCSettings.Encoding);
+            return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
         }
 
         #endregion

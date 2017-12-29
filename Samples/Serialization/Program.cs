@@ -7,7 +7,7 @@ using System.Threading;
 using WebSocketRPC;
 using System.Runtime.CompilerServices;
 
-namespace ServerClientJsSerialization
+namespace Serialization
 {
     class JpgBase64Converter : JsonConverter
     {
@@ -55,7 +55,7 @@ namespace ServerClientJsSerialization
 
             Bgr<byte>[,] image = null;
             try { image = imgUrl.GetBytes().DecodeAsColorImage(); }
-            catch(Exception ex) { throw new Exception("The specified url does not point to a valid image."); }
+            catch(Exception ex) { throw new Exception("The specified url does not point to a valid image.", ex); }
 
             image.Apply(c => swapChannels(c, order), inPlace: true);
             return image;
@@ -71,7 +71,7 @@ namespace ServerClientJsSerialization
 
     class Program
     {
-        //if access denied execute: "cmd"
+        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'ocalhost', add for public address)
         //open Index.html to run the client
         static void Main(string[] args)
         {
@@ -86,8 +86,9 @@ namespace ServerClientJsSerialization
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();
             Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI())).Wait();
- 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(ServerClientJsSerialization));
+
+
+            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(Serialization));
             Console.ReadLine();
             cts.Cancel();
         }

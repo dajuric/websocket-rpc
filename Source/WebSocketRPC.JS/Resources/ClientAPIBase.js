@@ -84,13 +84,13 @@ function onMessage(msg, onError)
 this.connect = function (onOpen, onError, onClose)
 {
     if (!!onOpen === false || typeof onOpen !== 'function')
-        throw 'OnOpen function callback is missing.';
+        throw 'onOpen function callback is missing.';
 
     if (!!onError === false || typeof onError !== 'function')
-        throw 'OnError function callback is missing.';
+        throw 'onError function callback is missing.';
 
     if (!!onClose === false || typeof onClose !== 'function')
-        throw 'OnClose function callback is missing.';
+        throw 'onClose function callback is missing.';
 
 
     if (!!window.WebSocket === false)
@@ -125,10 +125,10 @@ this.connect = function (onOpen, onError, onClose)
                 onClose({ id: evt.code, closeReason: evt.reason || "abnormal", summary: "Websocket connection was closed abnormally." });
                 break;
             case 1008:
-                onClose({ id: evt.code, closeReason: evt.reason || "policy violation", summary: "Websocket connection was closed due policy violation." });
+                onClose({ id: evt.code, closeReason: evt.reason || "policy violation", summary: "Websocket connection was closed due to policy violation." });
                 break;
             case 1009:
-                onClose({ id: evt.code, closeReason: evt.reason ||"message too big", summary: "Websocket connection was closed due too large message." });
+                onClose({ id: evt.code, closeReason: evt.reason ||"message too big", summary: "Websocket connection was closed due to too large message." });
                 break;
             case 3001:
                 break; //nothing

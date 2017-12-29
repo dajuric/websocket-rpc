@@ -53,7 +53,6 @@ namespace WebSocketRPC
             var methodList = objType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
             var overloadedMethodNames = methodList.GroupBy(x => x.Name)
-                                                  .DefaultIfEmpty()
                                                   .Where(x => x.Count() > 1)
                                                   .Select(x => x.Key);
 

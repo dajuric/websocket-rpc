@@ -20,7 +20,7 @@
             }
 
             //init API
-            var api = new LocalAPI("ws://localhost:8005");
+            var api = new LocalAPI("ws://localhost:8001");
 
             //implement the interface
             api.writeProgress = function (p)
@@ -34,6 +34,7 @@
                 document.getElementById("result").innerHTML = "Result: " + JSON.stringify(r, null, "\t");
             }
 
+            api.onOtherMessage = writeMsg;
             api.connect(() => execAPI(api), err => writeMsg(err, 'red'), msg => writeMsg(msg));
         </script>
 

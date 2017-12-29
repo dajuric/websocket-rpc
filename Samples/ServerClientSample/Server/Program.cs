@@ -26,7 +26,7 @@ namespace TestServer
 
     public class Program
     {
-        //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
+        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'ocalhost', add for public address)
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Red;

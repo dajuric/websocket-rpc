@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using WebSocketRPC;
 
-namespace ClientJsMultiService
+namespace MultiService
 {
     /// <summary>
     /// Numeric service providing operations on numbers.
@@ -41,7 +41,7 @@ namespace ClientJsMultiService
 
     class Program
     {
-        //if access denied execute: "netsh http delete urlacl url=http://+:8001/"
+        //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'ocalhost', add for public address)
         //open Index.html to run the client
         static void Main(string[] args)
         {
@@ -65,7 +65,7 @@ namespace ClientJsMultiService
             })
             .Wait(0);
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(ClientJsMultiService));
+            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(MultiService));
             Console.ReadLine();
             cts.Cancel();
         }

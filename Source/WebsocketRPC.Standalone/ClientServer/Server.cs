@@ -49,6 +49,9 @@ namespace WebSocketRPC
         /// <returns>Server task.</returns>
         public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, bool useHttps = false)
         {
+            if (port < 0 || port > UInt16.MaxValue)
+                throw new NotSupportedException($"The provided port value must in the range: [0..{UInt16.MaxValue}");
+
             var s = useHttps ? "s" : String.Empty;
             await ListenAsync($"http{s}://+:{port}/", token, onConnect);
         }
@@ -65,6 +68,9 @@ namespace WebSocketRPC
         /// <returns>Server task.</returns>
         public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, bool useHttps = false)
         {
+            if (port < 0 || port > UInt16.MaxValue)
+                throw new NotSupportedException($"The provided port value must in the range: [0..{UInt16.MaxValue}");
+
             var s = useHttps ? "s" : String.Empty;
             await ListenAsync($"http{s}://+:{port}/", token, onConnect, onHttpRequestAsync);
         }
@@ -98,8 +104,19 @@ namespace WebSocketRPC
         /// <returns>Server task.</returns>
         public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
         {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token), "The provided token must not be null.");
+
+            if (onConnect == null)
+                throw new ArgumentNullException(nameof(onConnect), "The provided connection action must not be null.");
+
+            if (onHttpRequestAsync == null)
+                throw new ArgumentNullException(nameof(onHttpRequestAsync), "The provided HTTP request/response action must not be null.");
+
+
             var listener = new HttpListener();
-            listener.Prefixes.Add(httpListenerPrefix);
+            try { listener.Prefixes.Add(httpListenerPrefix); }
+            catch (Exception ex) { throw new ArgumentException("The provided prefix is not supported. Prefixes have the format: 'http(s)://+:(port)/'", ex); }
 
             try { listener.Start(); }
             catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
@@ -147,7 +164,7 @@ namespace WebSocketRPC
             for (int i = 0; i < connections.Count; i++)
                 wsCloseTasks[i] = connections[i].CloseAsync();
 
-            Task.WaitAll(wsCloseTasks.Where(t => t != null).ToArray());
+            Task.WaitAll(wsCloseTasks.Where(t => t != null).ToArray()); //tasks will be null if 'CloseAsync' fails
             listener.Stop();
             connections.Clear();
         }
@@ -173,7 +190,7 @@ namespace WebSocketRPC
             }
             catch (Exception)
             {
-                ctx.Response.StatusCode = 500;
+                ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ctx.Response.Close();
                 return;
             }
