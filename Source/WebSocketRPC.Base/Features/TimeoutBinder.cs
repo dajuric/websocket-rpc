@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace WebSocketRPC
@@ -28,11 +29,12 @@ namespace WebSocketRPC
             timer.AutoReset = false;
             timer.Elapsed += Timer_Elapsed;
 
-            connection.OnOpen += () => timer.Enabled = true;
+            connection.OnOpen += () => { timer.Enabled = true; return Task.FromResult(true); };
             connection.OnReceive += msg =>
             {
                 timer.Enabled = false;
                 timer.Enabled = true;
+                return Task.FromResult(true);
             };
         }
 
@@ -61,7 +63,11 @@ namespace WebSocketRPC
             var binder = new TimeoutBinder(connection, timeout, closeMessage);
 
             lock (timeoutBinders) timeoutBinders.Add(binder);
-            connection.OnClose += () => { lock (timeoutBinders) timeoutBinders.Remove(binder); };
+            connection.OnClose += () => 
+            {
+                lock (timeoutBinders) timeoutBinders.Remove(binder);
+                return Task.FromResult(true);
+            };
         }
     }
 }

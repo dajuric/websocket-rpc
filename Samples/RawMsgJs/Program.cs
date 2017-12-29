@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using WebSocketRPC;
 
 namespace RawMsgJs
@@ -30,8 +31,8 @@ namespace RawMsgJs
                 c.BindTimeout(TimeSpan.FromSeconds(30));
 
                 c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC");
-                c.OnClose += () => Console.WriteLine("Connection closed.");
-                c.OnError += e => Console.WriteLine("Error: " + e.Message);
+                c.OnClose += () => { Console.WriteLine("Connection closed."); return Task.FromResult(true); };
+                c.OnError += e => { Console.WriteLine("Error: " + e.Message); return Task.FromResult(true); };
                 
                 c.OnReceive += async msg =>
                 {

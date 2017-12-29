@@ -31,7 +31,7 @@ namespace WebSocketRPC
     /// <summary>
     /// Provides the helper methods.
     /// </summary>
-    public static class HelperExtensions
+    static class HelperExtensions
     {
         /// <summary>
         /// Converts the specified binary data to a string data using the specified encoding.

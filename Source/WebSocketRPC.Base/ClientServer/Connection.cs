@@ -30,6 +30,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace WebSocketRPC
 {
@@ -38,6 +39,8 @@ namespace WebSocketRPC
     /// </summary>
     public class Connection
     {
+        #region Global settings
+
         static int maxMessageSize = 64 * 1024; //x KiB
         /// <summary>
         /// Gets or sets the maximum message size in bytes [1..Int32.MaxValue].
@@ -72,6 +75,8 @@ namespace WebSocketRPC
 
         static string messageToBig = "The message exceeds the maximum allowed message size: {0} bytes.";
 
+        #endregion
+
         WebSocket socket;
         TaskQueue sendTaskQueue;
 
@@ -92,22 +97,99 @@ namespace WebSocketRPC
         /// </summary>
         public IReadOnlyDictionary<string, string> Cookies { get; private set; }
 
+        #region Events
+
         /// <summary>
         /// Message receive event. Message is decoded using <seealso cref="Encoding"/>.
         /// </summary>
-        public event Action<string> OnReceive;
+        public event Func<string, Task> OnReceive;
         /// <summary>
         /// Open event.
         /// </summary>
-        public event Action OnOpen;
+        public event Func<Task> OnOpen;
         /// <summary>
         /// Close event.
         /// </summary>
-        public event Action OnClose;
+        public event Func<Task> OnClose;
         /// <summary>
         /// Error event Args: exception.
         /// </summary>
-        public event Action<Exception> OnError;
+        public event Func<Exception, Task> OnError;
+
+        /// <summary>
+        /// Invokes the error event.
+        /// </summary>
+        /// <param name="exception">Exception.</param>
+        internal void InvokeOnError(Exception exception)
+        {
+            if (OnError == null || exception == null)
+                return;
+
+            try
+            {
+                var members = OnError.GetInvocationList().Cast<Func<Exception, Task>>();
+
+                Task.WhenAll(members.Select(x => x(exception)))
+                    .Wait(0);
+            }
+            catch (Exception ex) when (ex.InnerException is TaskCanceledException)
+            { }
+        }
+
+        private void invokeOnOpen()
+        {
+            if (OnOpen == null)
+                return;
+
+            try
+            {
+                var members = OnOpen.GetInvocationList().Cast<Func<Task>>();
+
+                Task.WhenAll(members.Select(x=> x()))
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
+                    .Wait(0);
+            }
+            catch (Exception ex) when (ex.InnerException is TaskCanceledException)
+            { }
+        }
+
+        private void invokeOnReceive(string msg)
+        {
+            if (OnReceive == null)
+                return;
+
+            try
+            {
+                var members = OnReceive.GetInvocationList().Cast<Func<string, Task>>();
+
+                Task.WhenAll(members.Select(x => x(msg)))
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
+                    .Wait(0);
+            }
+            catch (Exception ex) when (ex.InnerException is TaskCanceledException)
+            { }
+        }
+
+        private void invokeOnClose()
+        {
+            if (OnClose == null)
+                return;
+
+            try
+            {
+                var members = OnClose.GetInvocationList().Cast<Func<Task>>();
+
+                Task.WhenAll(members.Select(x => x()))
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
+                    .Wait(0);
+            }
+            catch (Exception ex) when (ex.InnerException is TaskCanceledException)
+            { }
+        }
+
+        #endregion
+
+        #region Send
 
         /// <summary>
         /// Sends the specified data as the text message type.
@@ -151,6 +233,10 @@ namespace WebSocketRPC
             }
         }
 
+        #endregion
+
+        #region Close
+
         /// <summary>
         /// Closes the connection.
         /// </summary>
@@ -164,14 +250,27 @@ namespace WebSocketRPC
                 if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
                     await socket.CloseOutputAsync(closeStatus, statusDescription, CancellationToken.None);
             }
-            catch
-            { } //do not propagate the exception
+            catch(Exception ex)
+            {
+                InvokeOnError(ex);
+            }
             finally
             {
-                OnClose?.Invoke();
+                invokeOnClose();
                 clearEvents();
             }
         }
+
+        private void clearEvents()
+        {
+            OnClose = null;
+            OnError = null;
+            OnReceive = null;
+        }
+
+        #endregion
+
+        #region Receive (listen)
 
         /// <summary>
         /// Listens for the receive messages for the specified connection.
@@ -184,68 +283,67 @@ namespace WebSocketRPC
             {
                 try
                 {
-                    OnOpen?.Invoke();
-                    byte[] receiveBuffer = new byte[MaxMessageSize];
-
-                    while (socket.State == WebSocketState.Open)
-                    {
-                        WebSocketReceiveResult receiveResult = null;
-                        var count = 0;
-                        do
-                        {
-                            var segment = new ArraySegment<byte>(receiveBuffer, count, MaxMessageSize - count);
-                            receiveResult = await socket.ReceiveAsync(segment, CancellationToken.None);
-                            count += receiveResult.Count;
-
-                            if (count >= MaxMessageSize)
-                            {
-                                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
-                                return;
-                            }
-                        }
-                        while (receiveResult?.EndOfMessage == false);
-
-
-                        if (receiveResult.MessageType == WebSocketMessageType.Close)
-                        {
-                            await CloseAsync();
-                        }
-                        else
-                        {
-                            var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
-                            var msg = segment.ToString(Encoding);
-                            OnReceive?.Invoke(msg);
-                            Debug.WriteLine("Received: " + msg);
-                        }
-
-                        if (token.IsCancellationRequested)
-                            break;
-                    }
+                    await listenReceiveAsync(token);
                 }
                 catch (Exception ex)
                 {
-                    OnError?.Invoke(ex);
+                    InvokeOnError(ex);
                     await CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message);
                     //socket will be aborted -> no need to close manually
                 }
             }
         }
 
-        /// <summary>
-        /// Invokes the error event.
-        /// </summary>
-        /// <param name="ex">Exception.</param>
-        internal void InvokeError(Exception ex)
+        async Task listenReceiveAsync(CancellationToken token)
         {
-            OnError?.Invoke(ex);
+            invokeOnOpen();
+            byte[] receiveBuffer = new byte[maxMessageSize];
+
+            while (socket.State == WebSocketState.Open)
+            {
+                //receive
+                WebSocketReceiveResult receiveResult = null;
+                var count = 0;
+                do
+                {
+                    var segment = new ArraySegment<byte>(receiveBuffer, count, maxMessageSize - count);
+                    receiveResult = await socket.ReceiveAsync(segment, CancellationToken.None);
+                    count += receiveResult.Count;
+
+                    if (count >= maxMessageSize)
+                    {
+                        await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, maxMessageSize));
+                        return;
+                    }
+                }
+                while (receiveResult?.EndOfMessage == false);
+
+                //process response
+                switch (receiveResult.MessageType)
+                {
+                    case WebSocketMessageType.Close:
+                        await CloseAsync();
+                        break;
+                    case WebSocketMessageType.Binary:
+                        InvokeOnError(new NotSupportedException($"Binary messages are not supported. Received {count} bytes."));
+                        Debug.WriteLine("Received binary.");
+                        break;
+                    default:
+                        var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
+                        var msg = segment.ToString(encoding);
+
+                        invokeOnReceive(msg);
+                        Debug.WriteLine("Received: " + msg);
+                        break;
+                }
+
+                //check if cancellation is requested
+                if (token.IsCancellationRequested)
+                    break;
+            }
         }
 
-        private void clearEvents()
-        {
-            OnClose = null;
-            OnError = null;
-            OnReceive = null;
-        }
+        #endregion
     }
 }
 

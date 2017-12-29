@@ -56,13 +56,13 @@ namespace WebSocketRPC
         static void verifyType()
         {
             if (!typeof(TInterface).IsInterface)
-                throw new Exception("The specified type must be an interface type.");
+                throw new Exception($"The specified type '{typeof(TInterface).Name}' must be an interface type.");
 
             var methodList = typeof(TInterface).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
             var propertyList = typeof(TInterface).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             if (propertyList.Any())
-                throw new NotSupportedException("The interface must not declare any properties: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
+                throw new NotSupportedException($"The interface '{typeof(TInterface).Name}' must not declare any properties: { String.Join(", ", propertyList.Select(x => x.Name)) }.");
         }
 
 
@@ -89,7 +89,7 @@ namespace WebSocketRPC
             var response = await invokeAsync(funcName, argVals);
 
             if (response.Error != null)
-                throw new Exception(response.Error);
+                throw new Exception($"Exception thrown while calling {funcName}. Message: {response.Error}.");
         }
 
         public async Task<TResult> InvokeAsync<TResult>(Expression<Func<TInterface, TResult>> functionExpression)
@@ -97,10 +97,10 @@ namespace WebSocketRPC
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
 
-            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             if (response.Error != null)
-                throw new Exception(response.Error);
+                throw new Exception($"Exception thrown while calling {funcName}. Message: {response.Error}.");
 
+            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             return result;
         }
 
@@ -110,7 +110,7 @@ namespace WebSocketRPC
             var response = await invokeAsync(funcName, argVals);
 
             if (response.Error != null)
-                throw new Exception(response.Error);
+                throw new Exception($"Exception thrown while calling {funcName}. Message: {response.Error}.");
         }
 
         public async Task<TResult> InvokeAsync<TResult>(Expression<Func<TInterface, Task<TResult>>> functionExpression)
@@ -118,10 +118,10 @@ namespace WebSocketRPC
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
 
-            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             if (response.Error != null)
-                throw new Exception(response.Error);
+                throw new Exception($"Exception thrown while calling {funcName}. Message: {response.Error}.");
 
+            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             return result;
         }
 

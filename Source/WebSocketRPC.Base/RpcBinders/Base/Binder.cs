@@ -25,7 +25,7 @@
 
 using System;
 using System.Diagnostics;
-
+using System.Threading.Tasks;
 
 namespace WebSocketRPC
 {
@@ -43,6 +43,7 @@ namespace WebSocketRPC
                 Debug.WriteLine("Close");
 
                 lock (RPC.AllBinders) RPC.AllBinders.Remove(this);
+                return Task.FromResult(true);
             };
 
             Connection.OnError += e =>
@@ -50,6 +51,7 @@ namespace WebSocketRPC
                 Debug.WriteLine("Error");
 
                 lock (RPC.AllBinders) RPC.AllBinders.Remove(this);
+                return Task.FromResult(true);
             };
         }
     }

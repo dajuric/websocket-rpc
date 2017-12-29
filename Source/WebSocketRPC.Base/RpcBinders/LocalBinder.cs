@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 
 namespace WebSocketRPC
 {
@@ -48,7 +49,10 @@ namespace WebSocketRPC
 
             Connection.OnClose += () =>
             {
-                (Object as IDisposable)?.Dispose();
+                try { (Object as IDisposable)?.Dispose(); }
+                catch (Exception ex) { Connection.InvokeOnError(ex); }
+
+                return Task.FromResult(true);
             };
         }
 

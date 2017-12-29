@@ -206,7 +206,7 @@ namespace WebSocketRPC
             }
             catch (Exception ex)
             {
-                 connection.InvokeError(ex);
+                 connection.InvokeOnError(ex);
             }
             finally
             {

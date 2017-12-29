@@ -65,6 +65,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RawMsgJs", "Samples\RawMsgJ
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleBase", "Samples\SampleBase\SampleBase.shproj", "{4C3C0292-F1F5-4997-8A0E-B4C7D05BB22F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{96225EA6-4EA7-48AB-91F9-E53B0B5605F0}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Samples\SampleBase\SampleBase.projitems*{4c3c0292-f1f5-4997-8a0e-b4c7d05bb22f}*SharedItemsImports = 13
@@ -115,6 +117,10 @@ Global
 		{76FDC1DC-D80A-42E8-8A5D-2FE3462B9E3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76FDC1DC-D80A-42E8-8A5D-2FE3462B9E3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76FDC1DC-D80A-42E8-8A5D-2FE3462B9E3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96225EA6-4EA7-48AB-91F9-E53B0B5605F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96225EA6-4EA7-48AB-91F9-E53B0B5605F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96225EA6-4EA7-48AB-91F9-E53B0B5605F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96225EA6-4EA7-48AB-91F9-E53B0B5605F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +141,7 @@ Global
 		{CFC334A5-2B52-42A0-87AE-4B3F84B09530} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
 		{76FDC1DC-D80A-42E8-8A5D-2FE3462B9E3F} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
 		{4C3C0292-F1F5-4997-8A0E-B4C7D05BB22F} = {E5509F73-1E5E-45B4-AED7-4A38F8DF1DDE}
+		{96225EA6-4EA7-48AB-91F9-E53B0B5605F0} = {01049849-1A9A-4C3A-BD56-EA6B628F9F36}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {591A6475-8DF2-42DA-AFF1-8EF88BCF6EE4}
