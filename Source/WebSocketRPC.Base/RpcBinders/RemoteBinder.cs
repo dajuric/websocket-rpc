@@ -26,7 +26,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using static WebSocketRPC.RPCSettings;
 
 namespace WebSocketRPC
 {
@@ -38,14 +37,11 @@ namespace WebSocketRPC
             : base(connection)
         {
             rInvoker = new RemoteInvoker<TInterface>();
-            rInvoker.Initialize(r => Connection.SendAsync(r.ToJson(), Encoding));
+            rInvoker.Initialize(r => Connection.SendAsync(r.ToJson()));
 
-            Connection.OnReceive += async (d, isText) =>
+            Connection.OnReceive += async d =>
             {
-                if (!isText)
-                    return;
-
-                var msg = Response.FromJson(d.ToString(Encoding));
+                var msg = Response.FromJson(d);
                 if (msg.IsEmpty) return;
 
                 rInvoker.Receive(msg);

@@ -29,7 +29,7 @@ namespace WebSocketRPC
             timer.Elapsed += Timer_Elapsed;
 
             connection.OnOpen += () => timer.Enabled = true;
-            connection.OnReceive += (msg, isText) =>
+            connection.OnReceive += msg =>
             {
                 timer.Enabled = false;
                 timer.Enabled = true;

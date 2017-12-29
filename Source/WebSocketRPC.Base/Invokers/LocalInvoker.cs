@@ -108,7 +108,7 @@ namespace WebSocketRPC
 
             var argObjs = new object[args.Length];
             for (int i = 0; i < methodParams.Length; i++)
-                argObjs[i] = args[i].ToObject(methodParams[i].ParameterType, RPCSettings.Serializer);
+                argObjs[i] = args[i].ToObject(methodParams[i].ParameterType, RPC.Serializer);
 
 
             var hasResult = methods[functionName].ReturnType != typeof(void) &&
@@ -118,7 +118,7 @@ namespace WebSocketRPC
             if (hasResult)
             {
                 var returnVal = await invokeWithResultAsync(methods[functionName], obj, argObjs);
-                result = (returnVal != null) ? JToken.FromObject(returnVal, RPCSettings.Serializer) : null;
+                result = (returnVal != null) ? JToken.FromObject(returnVal, RPC.Serializer) : null;
             }
             else
             {

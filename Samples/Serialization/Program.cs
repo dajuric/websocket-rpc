@@ -78,8 +78,8 @@ namespace Serialization
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 
-            RPCSettings.MaxMessageSize = 1 * 1024 * 1024; //1MiB
-            RPCSettings.AddConverter(new JpgBase64Converter());
+            Connection.MaxMessageSize = 1 * 1024 * 1024; //1MiB
+            RPC.AddConverter(new JpgBase64Converter());
             
             //generate js code
             File.WriteAllText($"../../Site/{nameof(ImageProcessingAPI)}.js", RPCJs.GenerateCallerWithDoc<ImageProcessingAPI>());

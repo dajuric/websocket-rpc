@@ -56,9 +56,7 @@ namespace ClientJs
             var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
             {
                 c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI());
-                //c.BindTimeout(TimeSpan.FromSeconds(1)); //close connection if there is no incommming message after X seconds
-
-                c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC", RPCSettings.Encoding);
+                c.BindTimeout(TimeSpan.FromSeconds(1)); //close connection if there is no incommming message after X seconds
             });
 
             Console.Write("{0} ", nameof(ClientJs));

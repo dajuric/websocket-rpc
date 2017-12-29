@@ -24,7 +24,6 @@
 #endregion
 
 using System;
-using static WebSocketRPC.RPCSettings;
 
 namespace WebSocketRPC
 {
@@ -38,16 +37,13 @@ namespace WebSocketRPC
             lInvoker = new LocalInvoker<TObj>();
             Object = obj;
 
-            Connection.OnReceive += async (d, isText) =>
+            Connection.OnReceive += async d =>
             {
-                if (!isText)
-                    return;
-
-                var msg = Request.FromJson(d.ToString(Encoding));
+                var msg = Request.FromJson(d);
                 if (msg.IsEmpty) return;
 
                 var result = await lInvoker.InvokeAsync(Object, msg);
-                await Connection.SendAsync(result.ToJson(), Encoding);
+                await Connection.SendAsync(result.ToJson());
             };
 
             Connection.OnClose += () =>

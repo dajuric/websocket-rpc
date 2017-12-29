@@ -38,7 +38,38 @@ namespace WebSocketRPC
     /// </summary>
     public class Connection
     {
-        internal static int MaxMessageSize { get; set; } = 64 * 1024; //x KiB
+        static int maxMessageSize = 64 * 1024; //x KiB
+        /// <summary>
+        /// Gets or sets the maximum message size in bytes [1..Int32.MaxValue].
+        /// </summary>
+        public static int MaxMessageSize
+        {
+            get { return maxMessageSize; }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException("The message size must be set to a strictly positive value.");
+
+                maxMessageSize = value;
+            }
+        }
+
+        static Encoding encoding = Encoding.ASCII;
+        /// <summary>
+        /// Gets or sets the string RPC messaging encoding.
+        /// </summary>
+        public static Encoding Encoding
+        {
+            get { return encoding; }
+            set
+            {
+                if (encoding == null)
+                    throw new ArgumentException("The provided value must not be null.");
+
+                encoding = value;
+            }
+        }
+
         static string messageToBig = "The message exceeds the maximum allowed message size: {0} bytes.";
 
         WebSocket socket;
@@ -62,9 +93,9 @@ namespace WebSocketRPC
         public IReadOnlyDictionary<string, string> Cookies { get; private set; }
 
         /// <summary>
-        /// Message receive event. Args: message, is text message.
+        /// Message receive event. Message is decoded using <seealso cref="Encoding"/>.
         /// </summary>
-        public event Action<ArraySegment<byte>, bool> OnReceive;
+        public event Action<string> OnReceive;
         /// <summary>
         /// Open event.
         /// </summary>
@@ -79,49 +110,19 @@ namespace WebSocketRPC
         public event Action<Exception> OnError;
 
         /// <summary>
-        /// Sends the specified data as the binary message type.
-        /// </summary>
-        /// <param name="data">Text data to send.</param>
-        /// <param name="e">String encoding.</param>
-        /// <returns>True if the operation was successful, false otherwise.</returns>
-        public async Task<bool> SendAsync(byte[] data)
-        {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data), "The provided data must not be null.");
-
-            if (socket.State != WebSocketState.Open)
-                return false;
-    
-            if (data.Length >= MaxMessageSize)
-            {
-                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
-                return false;
-            }
-
-            Debug.WriteLine("Sending binary data.");
-            var segment = new ArraySegment<byte>(data, 0, data.Length);
-            await sendTaskQueue.Enqueue(() => sendAsync(segment, WebSocketMessageType.Binary));
-            return true;
-        }
-
-        /// <summary>
         /// Sends the specified data as the text message type.
         /// </summary>
         /// <param name="data">Text data to send.</param>
-        /// <param name="e">String encoding.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public async Task<bool> SendAsync(string data, Encoding e)
+        public async Task<bool> SendAsync(string data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data), "The provided tet must not be null.");
 
-            if (e == null)
-                throw new ArgumentNullException(nameof(e), "The provided encoding must not be null.");
-
             if (socket.State != WebSocketState.Open)
                 return false;
 
-            var bData = e.GetBytes(data);
+            var bData = Encoding.GetBytes(data);
             if (bData.Length >= MaxMessageSize)
             {
                 await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
@@ -212,8 +213,9 @@ namespace WebSocketRPC
                         else
                         {
                             var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
-                            OnReceive?.Invoke(segment, receiveResult.MessageType == WebSocketMessageType.Text);
-                            Debug.WriteLine("Received: " + segment.ToString(RPCSettings.Encoding));
+                            var msg = segment.ToString(Encoding);
+                            OnReceive?.Invoke(msg);
+                            Debug.WriteLine("Received: " + msg);
                         }
 
                         if (token.IsCancellationRequested)

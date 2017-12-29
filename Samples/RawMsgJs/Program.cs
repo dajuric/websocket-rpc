@@ -17,7 +17,7 @@ namespace RawMsgJs
         static void Main(string[] args)
         {
             //set message limit
-            RPCSettings.MaxMessageSize = RPCSettings.Encoding.GetMaxByteCount(40);
+            Connection.MaxMessageSize = Connection.Encoding.GetMaxByteCount(40);
 
             //generate js code
             File.WriteAllText($"./Site/{nameof(MessagingAPI)}.js", RPCJs.GenerateCaller<MessagingAPI>());
@@ -29,18 +29,17 @@ namespace RawMsgJs
                 //set idle timeout 
                 c.BindTimeout(TimeSpan.FromSeconds(30));
 
-                c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC", RPCSettings.Encoding);
+                c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC");
                 c.OnClose += () => Console.WriteLine("Connection closed.");
                 c.OnError += e => Console.WriteLine("Error: " + e.Message);
                 
-                c.OnReceive += async (msg, isText) =>
+                c.OnReceive += async msg =>
                 {
-                    var txt = msg.ToString(RPCSettings.Encoding);
-                    Console.WriteLine("Received: " + txt);
+                    Console.WriteLine("Received: " + msg);
 
-                    await c.SendAsync("Server received: " + txt, RPCSettings.Encoding);
+                    await c.SendAsync("Server received: " + msg);
 
-                    if (txt.ToLower() == "close")
+                    if (msg.ToLower() == "close")
                         await c.CloseAsync(statusDescription: "Close requested by user.");
                 };
             });

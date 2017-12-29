@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\Messages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Invokers\RemoteInvoker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RPC.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RPCSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\CookieUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TaskQueue.cs" />
   </ItemGroup>

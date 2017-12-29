@@ -23,6 +23,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +42,37 @@ namespace WebSocketRPC
         /// Gets the all binders.
         /// </summary>
         internal static readonly List<IBinder> AllBinders = new List<IBinder>();
+
+        #region Settings
+
+        class CamelCaseExceptDictionaryKeysResolver : CamelCasePropertyNamesContractResolver
+        {
+            protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
+            {
+                JsonDictionaryContract contract = base.CreateDictionaryContract(objectType);
+
+                contract.DictionaryKeyResolver = propertyName => propertyName;
+
+                return contract;
+            }
+        }
+
+        /// <summary>
+        /// Gets the messaging serializer.
+        /// </summary>
+        internal static readonly JsonSerializer Serializer = JsonSerializer.Create(new JsonSerializerSettings { ContractResolver = new CamelCaseExceptDictionaryKeysResolver() });
+
+        /// <summary>
+        /// Adds the serialization type converter.
+        /// </summary>
+        /// <param name="converter">Converter.</param>
+        public static void AddConverter(JsonConverter converter)
+        {
+            Serializer.Converters.Add(converter);
+        }
+
+        #endregion
+
 
         #region Bind
 
@@ -254,12 +287,11 @@ namespace WebSocketRPC
         /// <summary>
         /// Gets whether the data contain RPC message or not.
         /// </summary>
-        /// <param name="data">Received data.</param>
+        /// <param name="message">Received data.</param>
         /// <returns>True if the data contain RPC message, false otherwise.</returns>
-        public static bool IsRpcMessage(this ArraySegment<byte> data)
+        public static bool IsRpcMessage(string message)
         {
-            var str = data.ToString(RPCSettings.Encoding);
-            return !Request.FromJson(str).IsEmpty || !Response.FromJson(str).IsEmpty;
+            return !Request.FromJson(message).IsEmpty || !Response.FromJson(message).IsEmpty;
         }
 
         #endregion

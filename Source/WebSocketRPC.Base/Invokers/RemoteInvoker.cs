@@ -97,7 +97,7 @@ namespace WebSocketRPC
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
 
-            var result = response.ReturnValue.ToObject<TResult>(RPCSettings.Serializer);
+            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             if (response.Error != null)
                 throw new Exception(response.Error);
 
@@ -118,7 +118,7 @@ namespace WebSocketRPC
             var (funcName, argVals) = getFunctionInfo(functionExpression);
             var response = await invokeAsync(funcName, argVals);
 
-            var result = response.ReturnValue.ToObject<TResult>(RPCSettings.Serializer);
+            var result = response.ReturnValue.ToObject<TResult>(RPC.Serializer);
             if (response.Error != null)
                 throw new Exception(response.Error);
 
@@ -134,7 +134,7 @@ namespace WebSocketRPC
             {
                 FunctionName = name,
                 CallId = Guid.NewGuid().ToString(),
-                Arguments = args.Select(a => JToken.FromObject(a, RPCSettings.Serializer)).ToArray()
+                Arguments = args.Select(a => JToken.FromObject(a, RPC.Serializer)).ToArray()
             };
 
             var key = msg.FunctionName + "-" + msg.CallId;

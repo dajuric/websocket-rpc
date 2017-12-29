@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace WebSocketRPC
 {
-    public abstract class Binder : IBinder
+    abstract class Binder : IBinder
     {
         public Connection Connection { get; private set; }
 

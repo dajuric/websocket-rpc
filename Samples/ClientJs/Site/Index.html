@@ -34,7 +34,6 @@
                 document.getElementById("result").innerHTML = "Result: " + JSON.stringify(r, null, "\t");
             }
 
-            api.onOtherMessage = writeMsg;
             api.connect(() => execAPI(api), err => writeMsg(err, 'red'), msg => writeMsg(msg));
         </script>
 
