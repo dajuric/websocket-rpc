@@ -13,4 +13,6 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj" />
     </ItemGroup>
+	  
+    <Import Project="..\..\SampleBase\SampleBase.projitems" Label="Shared" />
 </Project>

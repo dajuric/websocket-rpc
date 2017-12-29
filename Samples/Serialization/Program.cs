@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using WebSocketRPC;
 using System.Runtime.CompilerServices;
+using SampleBase;
 
 namespace Serialization
 {
@@ -85,12 +86,10 @@ namespace Serialization
 
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();
-            Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI())).Wait();
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI()));
 
-
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(Serialization));
-            Console.ReadLine();
-            cts.Cancel();
+            Console.Write("{0} ", nameof(Serialization));
+            AppExit.WaitFor(cts, t);
         }
     }
 }

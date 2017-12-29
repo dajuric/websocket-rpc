@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SampleBase;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketRPC;
@@ -34,11 +35,10 @@ namespace TestServer
 
             //start server and bind to its local and remote API
             var cts = new CancellationTokenSource();
-            Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) => c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI())).Wait(0);
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) => c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI()));
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(TestServer));
-            Console.ReadLine();
-            cts.Cancel();
+            Console.Write("{0} ", nameof(TestServer));
+            AppExit.WaitFor(cts, t);
         }
     }
 }

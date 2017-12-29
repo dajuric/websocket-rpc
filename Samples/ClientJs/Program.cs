@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SampleBase;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketRPC;
 
-namespace RawMsgJs
+namespace ClientJs
 {
     /// <summary>
     /// Remote API.
@@ -52,7 +53,7 @@ namespace RawMsgJs
           
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();
-            var s = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
             {
                 c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI());
                 //c.BindTimeout(TimeSpan.FromSeconds(1)); //close connection if there is no incommming message after X seconds
@@ -60,10 +61,8 @@ namespace RawMsgJs
                 c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC", RPCSettings.Encoding);
             });
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(RawMsgJs));
-            Console.ReadLine();
-            cts.Cancel();
-            s.Wait();
+            Console.Write("{0} ", nameof(ClientJs));
+            AppExit.WaitFor(cts, t);
         }
     }
 }

@@ -122,7 +122,9 @@ namespace WebSocketRPC
             catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
             {
                 throw new UnauthorizedAccessException($"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
-                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'.", ex);
+                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'." + 
+                                                      $"\nRemarks:\n" + 
+                                                      $"  If using 'localhost', put 'delete' instead of 'add' and type the http prefix instead of 'localhost'.", ex);
             }
 
 			//helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks

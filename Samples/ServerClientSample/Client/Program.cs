@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SampleBase;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace TestClient
 
             //start client and bind to its local API
             var cts = new CancellationTokenSource();
-            Client.ConnectAsync("ws://localhost:8001/", cts.Token, c =>
+            var t = Client.ConnectAsync("ws://localhost:8001/", cts.Token, c =>
             {
                 c.Bind<RemoteAPI, ILocalAPI>(new RemoteAPI());
                 c.OnOpen += async () =>
@@ -39,12 +40,10 @@ namespace TestClient
                     var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
                     Console.WriteLine("\nResult: " + r.First());
                 };
-            })
-            .Wait(0);
+            });
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.\n", nameof(TestClient));
-            Console.ReadLine();
-            cts.Cancel();
+            Console.Write("{0} ", nameof(TestClient));
+            AppExit.WaitFor(cts, t);
         }
     }
 }

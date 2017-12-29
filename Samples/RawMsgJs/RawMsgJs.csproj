@@ -8,8 +8,6 @@
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
 		<StartupObject />
-
-    <DocumentationFile>bin\$(TargetFramework)\ServerClientJs.xml</DocumentationFile>
   </PropertyGroup>
 	
 	<ItemGroup>
@@ -26,4 +24,6 @@
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+  
+    <Import Project="..\SampleBase\SampleBase.projitems" Label="Shared" />
 </Project>

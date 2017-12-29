@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SampleBase;
+using System;
 using System.IO;
 using System.Threading;
 using WebSocketRPC;
@@ -51,7 +52,7 @@ namespace MultiService
 
             //start server and bind its local and remote APIs
             var cts = new CancellationTokenSource();
-            Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) => 
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) => 
             {
                 var path = wc.RequestUri.AbsolutePath;
                 if (path == "/numericService")
@@ -62,12 +63,10 @@ namespace MultiService
                 {
                     c.Bind(new TextService());
                 }
-            })
-            .Wait(0);
+            });
 
-            Console.Write("Running: '{0}'. Press [Enter] to exit.", nameof(MultiService));
-            Console.ReadLine();
-            cts.Cancel();
+            Console.Write("{0} ", nameof(MultiService));
+            AppExit.WaitFor(cts, t);
         }
     }
 }

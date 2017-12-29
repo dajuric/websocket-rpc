@@ -24,4 +24,6 @@
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+    
+    <Import Project="..\SampleBase\SampleBase.projitems" Label="Shared" />
 </Project>

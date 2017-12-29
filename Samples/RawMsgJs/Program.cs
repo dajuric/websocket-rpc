@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SampleBase;
+using System;
 using System.IO;
 using System.Threading;
 using WebSocketRPC;
@@ -23,7 +24,7 @@ namespace RawMsgJs
           
             //start server
             var cts = new CancellationTokenSource();
-            var s = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
             {
                 //set idle timeout 
                 c.BindTimeout(TimeSpan.FromSeconds(30));
@@ -43,10 +44,8 @@ namespace RawMsgJs
                 };
             });
 
-            Console.WriteLine("Running: '{0}'. Press [Enter] to exit.", nameof(RawMsgJs));
-            Console.ReadLine();
-            cts.Cancel();
-            s.Wait();
+            Console.Write("{0} ", nameof(RawMsgJs));
+            AppExit.WaitFor(cts, t);
         }
     }
 }
