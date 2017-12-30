@@ -23,7 +23,7 @@
             var api = new LocalAPI("ws://localhost:8001");
 
             //implement the interface
-            api.writeProgress = function (p)
+            api.writeProgress = p =>
             {
                 document.getElementById("progress").innerHTML = "Completed: " + p * 100 + "%";
             }

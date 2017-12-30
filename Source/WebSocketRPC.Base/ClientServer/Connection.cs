@@ -73,7 +73,7 @@ namespace WebSocketRPC
             }
         }
 
-        static string messageToBig = "The message exceeds the maximum allowed message size: {0} bytes.";
+        static string messageToBig = "The message exceeds the maximum allowed message size: {0} of allowed {1} bytes.";
 
         #endregion
 
@@ -97,6 +97,11 @@ namespace WebSocketRPC
         /// </summary>
         public IReadOnlyDictionary<string, string> Cookies { get; private set; }
 
+        /// <summary>
+        /// Gets whether the connection is opened or not.
+        /// </summary>
+        public bool IsAlive => socket?.State == WebSocketState.Open;
+
         #region Events
 
         /// <summary>
@@ -110,7 +115,7 @@ namespace WebSocketRPC
         /// <summary>
         /// Close event.
         /// </summary>
-        public event Func<Task> OnClose;
+        public event Func<WebSocketCloseStatus, string, Task> OnClose;
         /// <summary>
         /// Error event Args: exception.
         /// </summary>
@@ -170,16 +175,16 @@ namespace WebSocketRPC
             { }
         }
 
-        private void invokeOnClose()
+        private void invokeOnClose(WebSocketCloseStatus closeStatus, string statusDescription)
         {
             if (OnClose == null)
                 return;
 
             try
             {
-                var members = OnClose.GetInvocationList().Cast<Func<Task>>();
+                var members = OnClose.GetInvocationList().Cast<Func< WebSocketCloseStatus, string, Task >>();
 
-                Task.WhenAll(members.Select(x => x()))
+                Task.WhenAll(members.Select(x => x(closeStatus, statusDescription)))
                     .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
                     .Wait(0);
             }
@@ -207,7 +212,8 @@ namespace WebSocketRPC
             var bData = Encoding.GetBytes(data);
             if (bData.Length >= MaxMessageSize)
             {
-                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, MaxMessageSize));
+                //InvokeOnError(new NotSupportedException(String.Format(messageToBig, maxMessageSize)));
+                await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, bData.Length, maxMessageSize));
                 return false;
             }
 
@@ -256,7 +262,7 @@ namespace WebSocketRPC
             }
             finally
             {
-                invokeOnClose();
+                invokeOnClose(closeStatus, statusDescription);
                 clearEvents();
             }
         }
@@ -312,7 +318,8 @@ namespace WebSocketRPC
 
                     if (count >= maxMessageSize)
                     {
-                        await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, maxMessageSize));
+                        //InvokeOnError(new NotSupportedException(String.Format(messageToBig, maxMessageSize)));
+                        await CloseAsync(WebSocketCloseStatus.MessageTooBig, String.Format(messageToBig, count, maxMessageSize));
                         return;
                     }
                 }

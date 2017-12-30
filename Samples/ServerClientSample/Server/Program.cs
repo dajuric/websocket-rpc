@@ -1,5 +1,6 @@
 ﻿using SampleBase;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketRPC;
@@ -30,15 +31,27 @@ namespace TestServer
         //if access denied execute: "netsh http delete urlacl url=http://+:8001/" (delete for 'localhost', add for public address)
         static void Main(string[] args)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Server\n");
 
             //start server and bind to its local and remote API
             var cts = new CancellationTokenSource();
-            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) => c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI()));
+            var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) =>
+            {
+                c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI());
+
+                c.OnOpen  += () => Task.Run((Action)writeClientCount);
+                c.OnClose += (s, d) => Task.Run((Action)writeClientCount);
+            });
 
             Console.Write("{0} ", nameof(TestServer));
             AppExit.WaitFor(cts, t);
+        }
+
+        static void writeClientCount()
+        {
+            var cc = RPC.For<IRemoteAPI>().Count();
+            Console.WriteLine("Client count: " + cc);
         }
     }
 }

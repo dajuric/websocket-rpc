@@ -1,5 +1,5 @@
 set serverApp = "Server\bin\Server.exe"
-set clientApp = "Server\bin\Client.exe"
+set clientApp = "Client\bin\Client.exe"
 
 if NOT EXIST %serverApp% (
   echo Build 'Server' project first.

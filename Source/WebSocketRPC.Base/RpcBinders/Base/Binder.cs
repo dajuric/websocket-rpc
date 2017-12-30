@@ -38,7 +38,7 @@ namespace WebSocketRPC
             Connection = connection;
             lock(RPC.AllBinders) RPC.AllBinders.Add(this);
 
-            Connection.OnClose += () =>
+            Connection.OnClose += (s, d) =>
             {
                 Debug.WriteLine("Close");
 

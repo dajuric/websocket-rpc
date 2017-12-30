@@ -3,7 +3,7 @@ using System.Net;
 
 namespace WebSocketRPC
 {
-    internal static class CookieUtils
+    static class CookieUtils
     {
         public static Dictionary<string, string> GetCookies(CookieCollection cookieCollection)
         {

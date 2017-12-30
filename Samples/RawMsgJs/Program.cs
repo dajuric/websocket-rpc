@@ -22,7 +22,7 @@ namespace RawMsgJs
 
             //generate js code
             File.WriteAllText($"./Site/{nameof(MessagingAPI)}.js", RPCJs.GenerateCaller<MessagingAPI>());
-          
+
             //start server
             var cts = new CancellationTokenSource();
             var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
@@ -31,9 +31,9 @@ namespace RawMsgJs
                 c.BindTimeout(TimeSpan.FromSeconds(30));
 
                 c.OnOpen += async () => await c.SendAsync("Hello from server using WebSocketRPC");
-                c.OnClose += () => { Console.WriteLine("Connection closed."); return Task.FromResult(true); };
-                c.OnError += e => { Console.WriteLine("Error: " + e.Message); return Task.FromResult(true); };
-                
+                c.OnClose += (s, d)  => Task.Run(() => Console.WriteLine("Connection closed: " + d));
+                c.OnError += e       => Task.Run(() => Console.WriteLine("Error: " + e.Message));
+
                 c.OnReceive += async msg =>
                 {
                     Console.WriteLine("Received: " + msg);

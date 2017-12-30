@@ -40,7 +40,8 @@ namespace TestClient
                     var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
                     Console.WriteLine("\nResult: " + r.First());
                 };
-            });
+            }, 
+            reconnectOnError: true);
 
             Console.Write("{0} ", nameof(TestClient));
             AppExit.WaitFor(cts, t);

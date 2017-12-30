@@ -41,13 +41,15 @@ namespace WebSocketRPC
         /// <param name="uri">The target uri of the format: "ws://(address)/[path]".</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is established.</param>
-        /// <param name="reconnectOnError">True to reconnect on error, false otherwise.</param>
+        /// <param name="reconnectOnError">True to reconnect on error, false otherwise.
+        /// <para>If true, exceptions will not be thrown. Set to false when debugging.</para>
+        /// </param>
         /// <param name="reconnectOnClose">True to reconnect on normal close request, false otherwise.</param>
         /// <param name="secondsBetweenReconnect">The number of seconds between two reconnect attempts.</param>
         /// <param name="setOptions">Websocket option set method.</param>
         /// <returns>Client task.</returns>
         /// <exception cref="Exception">Socket connection exception thrown in case when <paramref name="reconnectOnError"/> and <paramref name="reconnectOnClose"/> is set to false.</exception>
-        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnect, bool reconnectOnError = true,
+        public static async Task ConnectAsync(string uri, CancellationToken token, Action<Connection> onConnect, bool reconnectOnError = false,
                                               bool reconnectOnClose = false, int secondsBetweenReconnect = 0, Action<ClientWebSocketOptions> setOptions = null)
         {
             var isClosedSuccessfully = true;

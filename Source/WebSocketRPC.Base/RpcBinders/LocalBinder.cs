@@ -47,7 +47,7 @@ namespace WebSocketRPC
                 await Connection.SendAsync(result.ToJson());
             };
 
-            Connection.OnClose += () =>
+            Connection.OnClose += (s, d) =>
             {
                 try { (Object as IDisposable)?.Dispose(); }
                 catch (Exception ex) { Connection.InvokeOnError(ex); }

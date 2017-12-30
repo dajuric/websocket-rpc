@@ -63,7 +63,7 @@ namespace WebSocketRPC
             var binder = new TimeoutBinder(connection, timeout, closeMessage);
 
             lock (timeoutBinders) timeoutBinders.Add(binder);
-            connection.OnClose += () => 
+            connection.OnClose += (s, d) => 
             {
                 lock (timeoutBinders) timeoutBinders.Remove(binder);
                 return Task.FromResult(true);

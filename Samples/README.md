@@ -5,7 +5,7 @@ The recommendation is to run samples in the following order (from the more simpl
 
 1. **RawMsgJs**  
     Javascript client and C# server.    
-    Sending/receiving raw text mesages.  
+    Sending/receiving raw text messages.  
     *Server is receiving messages form a client and sends back altered messages.*
 
 2. **ServerClientSample/++**  

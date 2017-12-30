@@ -39,9 +39,15 @@ namespace Tests
         {
             //RunTest(TestConnectionException);
 
-            RunTest(TestRpcInitializeException);
+            //RunTest(TestRpcInitializeException);
             //RunTest(TestRpcUnhandledException);
             //RunTest(TestRpcHandledException);
+
+            //RunTest(TestMaxMessageSize);
+
+            //RunTest(TestTimeout);
+
+            RunTest(TestMultiClient);
         }
     }
 }

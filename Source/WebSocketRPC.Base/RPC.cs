@@ -271,20 +271,6 @@ namespace WebSocketRPC
         #region Misc
 
         /// <summary>
-        /// Gets the connection count.
-        /// </summary>
-        public static int ConnectionCount
-        {
-            get
-            {
-                return AllBinders.ToArray()
-                                 .Select(x => x.Connection)
-                                 .Distinct()
-                                 .Count();
-            }
-        }
-
-        /// <summary>
         /// Gets whether the data contain RPC message or not.
         /// </summary>
         /// <param name="message">Received data.</param>

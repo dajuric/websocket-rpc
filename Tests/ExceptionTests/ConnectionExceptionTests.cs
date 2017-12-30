@@ -12,17 +12,12 @@ namespace Tests
             var ts = Server.ListenAsync($"http://{address}", cts.Token, (c, wc) => c.Bind(new ServiceAPI()));
             var tc = Client.ConnectAsync($"ws://{address}", cts.Token, c =>
             {
-                c.Bind<IServiceAPI>();
                 c.OnOpen += () =>
                 {
                     throw new NotImplementedException();
                 };
 
-                c.OnError += e =>
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                    return Task.FromResult(true);
-                };
+                c.OnError += e => Task.Run(() => Console.WriteLine("Error: " + e.Message));
             },
             reconnectOnError: false);
 

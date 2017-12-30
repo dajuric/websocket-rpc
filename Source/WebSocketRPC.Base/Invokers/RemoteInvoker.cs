@@ -31,7 +31,6 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections.Concurrent;
-using System.Threading;
 
 namespace WebSocketRPC
 {

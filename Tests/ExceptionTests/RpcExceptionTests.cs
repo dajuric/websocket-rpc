@@ -25,7 +25,7 @@ namespace Tests
             var ts = Server.ListenAsync($"http://{address}", cts.Token, (c, wc) => c.Bind(new ServiceAPI()));
             var tc = Client.ConnectAsync($"ws://{address}", cts.Token, c =>
             {
-                c.Bind<ServiceAPI>();
+                c.Bind<ServiceAPI>(); //should generate an exception: must be an interface
                 c.OnOpen += async () =>
                 {
                     try
@@ -38,11 +38,7 @@ namespace Tests
                     }
                 };
 
-                c.OnError += e =>
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                    return Task.FromResult(true);
-                };
+                c.OnError += e => Task.Run(() => Console.WriteLine("Error: " + e.Message));
             },
             reconnectOnError: false);
 
@@ -60,11 +56,7 @@ namespace Tests
                     var results = await RPC.For<IServiceAPI>().CallAsync(x => x.LongRunningTask(1, 2));
                 };
 
-                c.OnError += e =>
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                    return Task.FromResult(true);
-                };
+                c.OnError += e => Task.Run(() => Console.WriteLine("Error: " + e.Message));
             },
             reconnectOnError: false);
 
@@ -89,11 +81,7 @@ namespace Tests
                     }
                 };
 
-                c.OnError += e =>
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                    return Task.FromResult(true);
-                };
+                c.OnError += e => Task.Run(() => Console.WriteLine("Error: " + e.Message));
             },
             reconnectOnError: false);
 
