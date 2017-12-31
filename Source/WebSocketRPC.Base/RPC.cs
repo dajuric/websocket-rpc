@@ -72,10 +72,10 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Gets or sets the time after a remote call will be canceled by raising <see cref="OperationCanceledException"/>.
+        /// Gets or sets a delay after a remote call will be canceled by raising <see cref="OperationCanceledException"/>.
         /// <para>Values equal or less than zero (total milliseconds) correspond to an indefinite time period.</para>
         /// </summary>
-        public static TimeSpan RpcTerminationDelay { get; set; } = TimeSpan.Zero;
+        public static TimeSpan RpcTerminationDelay { get; set; } = TimeSpan.FromSeconds(10);
 
         #endregion
 
