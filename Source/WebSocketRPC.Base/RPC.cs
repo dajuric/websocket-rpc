@@ -111,7 +111,7 @@ namespace WebSocketRPC
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
-        /// <returns>Loca and remote binder.</returns>
+        /// <returns>Local and remote binder.</returns>
         public static (ILocalBinder<TObj>, IRemoteBinder<TInterface>) Bind<TObj, TInterface>(this Connection connection, TObj obj)
         {
             return (connection.Bind(obj), connection.Bind<TInterface>());

@@ -29,6 +29,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,13 +41,14 @@ namespace WebSocketRPC
     public static class Server
     {
         /// <summary>
-        /// Creates and starts a new instance of the http / websocket server.
+        /// Creates and starts a new instance of the http(s) / websocket server.
+		/// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
         /// <param name="port">The http/https URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
-        /// <returns>Server task.</returns>
+        /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, bool useHttps = false)
         {
             if (port < 0 || port > UInt16.MaxValue)
@@ -58,14 +60,14 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Creates and starts a new instance of the http / websocket server.
-        /// <para>All HTTP requests will have the 'BadRequest' response.</para>
+        /// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
         /// <param name="port">The http/https URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
         /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
-        /// <returns>Server task.</returns>
+        /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, bool useHttps = false)
         {
             if (port < 0 || port > UInt16.MaxValue)
@@ -79,11 +81,12 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Creates and starts a new instance of the http / websocket server.
+		/// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
         /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <returns>Server task.</returns>
+        /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
             await ListenAsync(httpListenerPrefix, token, onConnect, (rq, rp) => 
@@ -95,13 +98,12 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Creates and starts a new instance of the http / websocket server.
-        /// <para>All HTTP requests will have the 'BadRequest' response.</para>
         /// </summary>
         /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
-        /// <returns>Server task.</returns>
+        /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
         {
             if (token == null)
@@ -121,10 +123,8 @@ namespace WebSocketRPC
             try { listener.Start(); }
             catch (Exception ex) when ((ex as HttpListenerException)?.ErrorCode == 5)
             {
-                throw new UnauthorizedAccessException($"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
-                                                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'." + 
-                                                      $"\nRemarks:\n" + 
-                                                      $"  If using 'localhost', put 'delete' instead of 'add' and type the http prefix instead of 'localhost'.", ex);
+                var msg = getNamespaceReservationExceptionMessage(httpListenerPrefix);
+                throw new UnauthorizedAccessException(msg, ex);
             }
 
 			//helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks
@@ -159,6 +159,28 @@ namespace WebSocketRPC
             Debug.WriteLine("Server stopped.");
         }
 
+		static string getNamespaceReservationExceptionMessage(string httpListenerPrefix)
+        {
+            string msg = null;
+            var m = Regex.Match(httpListenerPrefix, @"(?<protocol>\w+)://localhost:?(?<port>\d*)");
+
+            if (m.Success)
+            {
+                var protocol = m.Groups["protocol"].Value;
+                var port = m.Groups["port"].Value; if (String.IsNullOrEmpty(port)) port = 80.ToString();
+
+                msg = $"The HTTP server can not be started, as the namespace reservation already exists.\n" +
+                      $"Please run (elevated): 'netsh http delete urlacl url={protocol}://+:{port}/'.";
+            }
+            else
+            {
+                msg = $"The HTTP server can not be started, as the namespace reservation does not exist.\n" +
+                      $"Please run (elevated): 'netsh http add urlacl url={httpListenerPrefix} user=\"Everyone\"'.";
+            }
+
+            return msg;
+        }
+		
         static void closeListener(HttpListener listener)
         {
             var wsCloseTasks = new Task[connections.Count];
