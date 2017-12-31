@@ -33,10 +33,10 @@ namespace WebSocketRPC
     {
         RemoteInvoker<TInterface> rInvoker = null;
 
-        public RemoteBinder(Connection connection)
+        public RemoteBinder(Connection connection, TimeSpan rpcTerminationDelay)
             : base(connection)
         {
-            rInvoker = new RemoteInvoker<TInterface>();
+            rInvoker = new RemoteInvoker<TInterface>(rpcTerminationDelay);
             rInvoker.Initialize(r => Connection.SendAsync(r.ToJson()));
 
             Connection.OnReceive += async d =>

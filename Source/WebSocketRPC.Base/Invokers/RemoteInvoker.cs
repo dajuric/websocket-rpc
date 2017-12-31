@@ -31,26 +31,50 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace WebSocketRPC
 {
     class RemoteInvoker<TInterface>
     {
-        static HashSet<Type> verifiedTypes = new HashSet<Type>();
-
-        Func<Request, Task> sendAsync;
-        ConcurrentDictionary<string, TaskCompletionSource<Response>> runningMethods;
-
-        public RemoteInvoker()
+        class RpcWaiter: IDisposable
         {
-            runningMethods = new ConcurrentDictionary<string, TaskCompletionSource<Response>>();
-            if (verifiedTypes.Contains(typeof(TInterface))) return;
+            TaskCompletionSource<Response> completionSource;
+            CancellationTokenSource tokenSource;
 
-            //verify constraints
-            verifyType();
-            //cache it
-            verifiedTypes.Add(typeof(TInterface));  
+            public RpcWaiter(TimeSpan delay)
+            {
+                var delayMs = (int)delay.TotalMilliseconds;
+                if (delayMs <= 0) delayMs = -1;
+
+                completionSource = new TaskCompletionSource<Response>();
+                tokenSource = new CancellationTokenSource(delayMs);
+
+                tokenSource.Token.Register(() =>
+                {
+                    var ex = new OperationCanceledException("RPC was canceled due to timeout.");
+                    completionSource.TrySetException(ex);
+                });
+            }
+
+            public Task<Response> Task => completionSource.Task;
+
+            public void SetResult(Response result)
+            {
+                completionSource.SetResult(result);
+            }
+
+            public void Dispose()
+            {
+                if (tokenSource == null)
+                    return;
+
+                tokenSource.Dispose();
+                tokenSource = null;
+            }
         }
+
+        static HashSet<Type> verifiedTypes = new HashSet<Type>();
 
         static void verifyType()
         {
@@ -64,6 +88,20 @@ namespace WebSocketRPC
                 throw new NotSupportedException($"The interface '{typeof(TInterface).Name}' must not declare any properties: { String.Join(", ", propertyList.Select(x => x.Name)) }.");
         }
 
+        Func<Request, Task> sendAsync;
+        ConcurrentDictionary<string, RpcWaiter> runningMethods;
+
+        public RemoteInvoker(TimeSpan rpcTerminationDelay)
+        {
+            RequestTerminationDelay = rpcTerminationDelay;
+            runningMethods = new ConcurrentDictionary<string, RpcWaiter>();
+            if (verifiedTypes.Contains(typeof(TInterface))) return;
+
+            //verify constraints
+            verifyType();
+            //cache it
+            verifiedTypes.Add(typeof(TInterface));  
+        }
 
         public void Initialize(Func<Request, Task> sendAsync)
         {
@@ -81,6 +119,9 @@ namespace WebSocketRPC
             }
         }
 
+        public TimeSpan RequestTerminationDelay { get; private set; }
+
+        #region Invoke
 
         public async Task InvokeAsync(Expression<Action<TInterface>> functionExpression)
         {
@@ -137,13 +178,22 @@ namespace WebSocketRPC
             };
 
             var key = msg.FunctionName + "-" + msg.CallId;
-
-            runningMethods[key] = new TaskCompletionSource<Response>();
+            runningMethods[key] = new RpcWaiter(RequestTerminationDelay);
             await sendAsync(msg);
-            await runningMethods[key].Task;
 
-            var response = runningMethods[key].Task.Result;
-            runningMethods.TryRemove(key, out TaskCompletionSource<Response> _);
+            Response response = default(Response);
+            try
+            {
+                await runningMethods[key].Task;
+                response = runningMethods[key].Task.Result;
+            }
+            //catch (OperationCanceledException) { throw; }
+            finally
+            {
+                runningMethods[key].Dispose();
+                runningMethods.TryRemove(key, out RpcWaiter _);
+            }
+
             return response;
         }
 
@@ -166,5 +216,7 @@ namespace WebSocketRPC
             var fName = ((MethodCallExpression)expression.Body).Method.Name;
             return (fName, values.ToArray());
         }
+
+        #endregion
     }
 }

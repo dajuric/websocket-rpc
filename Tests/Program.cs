@@ -46,8 +46,10 @@ namespace Tests
             //RunTest(TestMaxMessageSize);
 
             //RunTest(TestTimeout);
+            RunTest(TestRpcTimeout);
 
-            RunTest(TestMultiClient);
+            //RunTest(TestMultiClient);
+
         }
     }
 }

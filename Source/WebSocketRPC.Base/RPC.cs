@@ -71,6 +71,12 @@ namespace WebSocketRPC
             Serializer.Converters.Add(converter);
         }
 
+        /// <summary>
+        /// Gets or sets the time after a remote call will be canceled by raising <see cref="OperationCanceledException"/>.
+        /// <para>Values equal or less than zero (total milliseconds) correspond to an indefinite time period.</para>
+        /// </summary>
+        public static TimeSpan RpcTerminationDelay { get; set; } = TimeSpan.Zero;
+
         #endregion
 
 
@@ -102,15 +108,17 @@ namespace WebSocketRPC
             if (AllBinders.ToArray().OfType<IRemoteBinder<TInterface>>().Any(x => x.Connection == connection))
                 throw new NotSupportedException("Only one remote binder is permitted.");
 
-            return new RemoteBinder<TInterface>(connection);
+            return new RemoteBinder<TInterface>(connection, RpcTerminationDelay);
         }
 
         /// <summary>
         /// Creates two way RPC sending binding for the provided connection.
         /// <para>Shorthand for binding local and remote binder separately.</para>
         /// </summary>
+        /// <typeparam name="TObj">Object type.</typeparam>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
+        /// <param name="obj">The object to bind with the connection.</param>
         /// <returns>Local and remote binder.</returns>
         public static (ILocalBinder<TObj>, IRemoteBinder<TInterface>) Bind<TObj, TInterface>(this Connection connection, TObj obj)
         {
