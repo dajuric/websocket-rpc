@@ -1,5 +1,6 @@
 ﻿using SampleBase;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using WebSocketRPC;
@@ -66,6 +67,7 @@ namespace MultiService
             });
 
             Console.Write("{0} ", nameof(MultiService));
+            Process.Start(new ProcessStartInfo(Path.GetFullPath("./Site/Index.html")) { UseShellExecute = true });
             AppExit.WaitFor(cts, t);
         }
     }

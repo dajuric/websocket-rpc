@@ -1,5 +1,6 @@
 ﻿using SampleBase;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +61,7 @@ namespace ClientJs
             });
 
             Console.Write("{0} ", nameof(ClientJs));
+            Process.Start(new ProcessStartInfo(Path.GetFullPath("./Site/Index.html")) { UseShellExecute= true });
             AppExit.WaitFor(cts, t);
         }
     }

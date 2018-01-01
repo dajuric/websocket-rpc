@@ -7,6 +7,7 @@ using System.Threading;
 using WebSocketRPC;
 using System.Runtime.CompilerServices;
 using SampleBase;
+using System.Diagnostics;
 
 namespace Serialization
 {
@@ -89,6 +90,7 @@ namespace Serialization
             var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) => c.Bind(new ImageProcessingAPI()));
 
             Console.Write("{0} ", nameof(Serialization));
+            Process.Start(new ProcessStartInfo(Path.GetFullPath("../../Site/Index.html")) { UseShellExecute = true });
             AppExit.WaitFor(cts, t);
         }
     }

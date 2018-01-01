@@ -1,5 +1,6 @@
 ﻿using SampleBase;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,6 +47,7 @@ namespace RawMsgJs
             });
 
             Console.Write("{0} ", nameof(RawMsgJs));
+            Process.Start(new ProcessStartInfo(Path.GetFullPath("./Site/Index.html")) { UseShellExecute = true });
             AppExit.WaitFor(cts, t);
         }
     }

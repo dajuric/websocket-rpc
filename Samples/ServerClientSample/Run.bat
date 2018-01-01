@@ -1,5 +1,6 @@
-set serverApp = "Server\bin\Server.exe"
-set clientApp = "Client\bin\Client.exe"
+set currPath="%cd%
+set serverPath="%cd%\Server\bin\net47"
+set clientPath="%cd%\Client\bin\net47"
 
 if NOT EXIST %serverApp% (
   echo Build 'Server' project first.
@@ -11,6 +12,10 @@ if NOT EXIST %clientApp% (
   goto :eof
 )
 
-start %serverApp%
-timeout 1>nul
-start %clientApp%
+cd %serverPath%
+start Server.exe
+timeout /T 1  > nul
+cd %clientPath%
+start Client.exe
+
+cd %currPath%

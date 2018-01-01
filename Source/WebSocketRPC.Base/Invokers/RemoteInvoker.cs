@@ -74,6 +74,8 @@ namespace WebSocketRPC
             }
         }
 
+        #region Static
+
         static HashSet<Type> verifiedTypes = new HashSet<Type>();
 
         static void verifyType()
@@ -87,6 +89,8 @@ namespace WebSocketRPC
             if (propertyList.Any())
                 throw new NotSupportedException($"The interface '{typeof(TInterface).Name}' must not declare any properties: { String.Join(", ", propertyList.Select(x => x.Name)) }.");
         }
+
+        #endregion
 
         Func<Request, Task> sendAsync;
         ConcurrentDictionary<string, RpcWaiter> runningMethods;
