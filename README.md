@@ -59,8 +59,6 @@ Client.ListenAsync("ws://localhost:8000/", CancellationToken.None, c =>
 reconnectOnError: true)
 .Wait(0);
  ```
-{empty} . 
-
 
 #### 2) .NET <-> .NET (RPC)
 A data aggregator service is built. The server gets the multiple number sequences of each client and sums all the numbers.  
@@ -127,7 +125,6 @@ class ClientAPI
 Client.ListenAsync("ws://localhost:8000/", CancellationToken.None, 
                    c => c.Bind(new ClientAPI())).Wait(0);
  ``` 
-{empty} .  
 
 #### 3) .NET <-> Javascript (RPC)
 Simple math service is built and invoked remotely. The math service has a single long running method which adds two numbers (server side).
@@ -189,8 +186,6 @@ api.connect(async () =>
 */
  ``` 
   
-{empty} .  
-
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
 + questions, comments - Github
