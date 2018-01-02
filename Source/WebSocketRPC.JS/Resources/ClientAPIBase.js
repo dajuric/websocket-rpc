@@ -153,14 +153,14 @@ this.onOtherMessage = null;
  * Send the message using the underlying websocket connection.
  * @param {Message} - message.
 */
-this.send = (msg) => ws.send(msg);
+this.send = function (message) { ws.send(message); }
 
 /*
  * Closes the underlying websocket connection.
  * @param {number} - Status code (see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes for details).
  * @param {string} - Human readable close reason (the max length is 123 bytes / ASCII characters).
 */
-this.close = (code, closeReason) =>
+this.close = function (code, closeReason)
 {
     code = (code === undefined) ? 1000 : code;
     closeReason = closeReason || "";

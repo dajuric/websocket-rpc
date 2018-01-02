@@ -9,9 +9,9 @@ using WebSocketRPC;
 namespace ClientJs
 {
     /// <summary>
-    /// Remote API.
+    /// Progress API.
     /// </summary>
-    interface IRemoteAPI
+    interface IProgressAPI
     {
         /// <summary>
         /// Writes progress.
@@ -21,9 +21,9 @@ namespace ClientJs
     }
 
     /// <summary>
-    /// Local API.
+    /// Task API.
     /// </summary>
-    class LocalAPI
+    class TaskAPI
     {
         /// <summary>
         /// Executes long running addition task.
@@ -36,7 +36,7 @@ namespace ClientJs
             for (var p = 0; p <= 100; p += 5)
             {
                 await Task.Delay(250);
-                await RPC.For<IRemoteAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
+                await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
             }
 
             return a + b;
@@ -50,13 +50,13 @@ namespace ClientJs
         static void Main(string[] args)
         {
             //generate js code
-            File.WriteAllText($"./Site/{nameof(LocalAPI)}.js", RPCJs.GenerateCallerWithDoc<LocalAPI>());
+            File.WriteAllText($"./Site/{nameof(TaskAPI)}.js", RPCJs.GenerateCallerWithDoc<TaskAPI>());
           
             //start server and bind its local and remote API
             var cts = new CancellationTokenSource();
             var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, ws) =>
             {
-                c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI());
+                c.Bind<TaskAPI, IProgressAPI>(new TaskAPI());
                 c.BindTimeout(TimeSpan.FromSeconds(1)); //close connection if there is no incommming message after X seconds
             });
 

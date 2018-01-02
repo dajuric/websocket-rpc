@@ -41,13 +41,13 @@ namespace Tests
             //RunTest(TestConnectionException);
 
             //RunTest(TestRpcInitializeException);
-            //RunTest(TestRpcUnhandledException);
+            RunTest(TestRpcUnhandledException);
             //RunTest(TestRpcHandledException);
 
             //RunTest(TestMaxMessageSize);
 
             //RunTest(TestTimeout);
-            RunTest(TestRpcTimeout);
+            //RunTest(TestRpcTimeout);
 
             //RunTest(TestMultiClient);
 

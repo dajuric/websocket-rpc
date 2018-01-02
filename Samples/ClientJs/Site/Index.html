@@ -1,7 +1,7 @@
 ﻿<html>
     <head>
         <title>Client JS</title>
-        <script src="LocalAPI.js"></script>
+        <script src="TaskAPI.js"></script>
     </head>
 
     <body>
@@ -21,7 +21,7 @@
             }
 
             //init API
-            var api = new LocalAPI("ws://localhost:8001");
+            var api = new TaskAPI("ws://localhost:8001");
 
             //implement the interface
             api.writeProgress = p =>

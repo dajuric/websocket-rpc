@@ -7,19 +7,19 @@ using WebSocketRPC;
 
 namespace TestServer
 {
-    interface IRemoteAPI
+    interface IProgressAPI
     {
         void WriteProgress(float progress);
     }
 
-    class LocalAPI
+    class TaskAPI
     {
         public async Task<int> LongRunningTask(int a, int b)
         {
             for (var p = 0; p <= 100; p += 5)
             {
                 await Task.Delay(250);
-                await RPC.For<IRemoteAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
+                await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
             }
             
             return a + b;
@@ -38,7 +38,7 @@ namespace TestServer
             var cts = new CancellationTokenSource();
             var t = Server.ListenAsync("http://localhost:8001/", cts.Token, (c, wc) =>
             {
-                c.Bind<LocalAPI, IRemoteAPI>(new LocalAPI());
+                c.Bind<TaskAPI, IProgressAPI>(new TaskAPI());
 
                 c.OnOpen  += () => Task.Run((Action)writeClientCount);
                 c.OnClose += (s, d) => Task.Run((Action)writeClientCount);
@@ -50,7 +50,7 @@ namespace TestServer
 
         static void writeClientCount()
         {
-            var cc = RPC.For<IRemoteAPI>().Count();
+            var cc = RPC.For<IProgressAPI>().Count();
             Console.WriteLine("Client count: " + cc);
         }
     }

@@ -7,12 +7,12 @@ using WebSocketRPC;
 
 namespace TestClient
 {
-    interface ILocalAPI
+    interface ITaskAPI
     {
         Task<int> LongRunningTask(int a, int b);
     }
 
-    class RemoteAPI //:IRemoteAPI
+    class ProgressAPI //:ITaskAPI
     {
         public void WriteProgress(float progress)
         {
@@ -34,10 +34,10 @@ namespace TestClient
             var cts = new CancellationTokenSource();
             var t = Client.ConnectAsync("ws://localhost:8001/", cts.Token, c =>
             {
-                c.Bind<RemoteAPI, ILocalAPI>(new RemoteAPI());
+                c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI());
                 c.OnOpen += async () =>
                 {
-                    var r = await RPC.For<ILocalAPI>().CallAsync(x => x.LongRunningTask(5, 3));
+                    var r = await RPC.For<ITaskAPI>().CallAsync(x => x.LongRunningTask(5, 3));
                     Console.WriteLine("\nResult: " + r.First());
                 };
             }, 

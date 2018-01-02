@@ -26,7 +26,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace WebSocketRPC
@@ -97,7 +99,7 @@ namespace WebSocketRPC
                     jsDoc.AppendLine(String.Format("{0} * @param {{{1}}} - {2}", linePrefix, pTypes[i].Name, p[pNames[i]]));
                 }
 
-                jsDoc.AppendLine(String.Format("{0} * @returns {{{1}}} - {2}", linePrefix, returnType.Name, r));
+                jsDoc.AppendLine(String.Format("{0} * @returns {{{1}}} - {2}", linePrefix, getTypeName(returnType), r));
             }
             jsDoc.AppendLine(String.Format("{0}*/", linePrefix));
 
@@ -170,6 +172,14 @@ namespace WebSocketRPC
             }
 
             return s;
+        }
+
+        static string getTypeName(Type type)
+        {
+            if (type.GetGenericTypeDefinition() != typeof(Task<>))
+                return type.Name;
+
+            return type.GenericTypeArguments.First().Name + " (Task)";
         }
     }
 }
