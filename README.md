@@ -39,17 +39,17 @@ The server's *TaskAPI* has a function which during its execution updates progres
 
 **Server** (C#)
  ``` csharp
+ //client's API contract
 interface IProgressAPI
 {
    void WriteProgress(float progress);
 }
 
-class TaskAPI //:ITaskAPI
+//server's API
+class TaskAPI  //:ITaskAPI
 {
-   public async Task<int> LongRunningTask(int a, int b)
-   {
-      for (var p = 0; p <= 100; p += 5)
-      {
+   public async Task<int> LongRunningTask(int a, int b) {
+      for (var p = 0; p <= 100; p += 5) {
          await Task.Delay(250);
          //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
          await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
@@ -60,13 +60,15 @@ class TaskAPI //:ITaskAPI
 }
 
 ...
+//run the server and bind the local and remote API to a connection
 Server.ListenAsync(8000, CancellationToken.None, 
                    (c, wc) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()))
-      .Wait(0);
+       .Wait(0);
  ``` 
  
 **Client** (C#)
 ``` csharp
+//client's API
 class ProgressAPI //:IProgressAPI
 {
    void WriteProgress(float progress) {
@@ -74,17 +76,20 @@ class ProgressAPI //:IProgressAPI
    }
 }
 
+//server's API contract
 interface ITaskAPI {
    Task<int> LongRunningTask(int a, int b);
 }
 
 ...
+//run the client and bind the APIs to the connection
 Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None, 
                     (c, wc) => c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI()))
       .Wait(0);
 ...
-var r = await RPC.For<ITaskAPI>().First().CallAsync(x => LongRunningTask(5, 3)); 
-Console.WriteLine("Result: " + r);
+//make an RPC
+var r = await RPC.For<ITaskAPI>().CallAsync(x => LongRunningTask(5, 3)); 
+Console.WriteLine("Result: " + r.First());
 
 /*
  Output:
@@ -114,15 +119,13 @@ File.WriteAllText("TaskAPI.js", code);
 var api = new TaskAPI("ws://localhost:8001");
 
 //implement the interface by extending the 'TaskAPI' object
-api.writeProgress = function (p)
-{
+api.writeProgress = function (p) {
      console.log("Completed: " + p * 100 + "%");
      return true;
 }
 
 //connect and excecute (when connection is opened)
-api.connect(async () => 
-{
+api.connect(async () => {
      var r = await api.longRunningTask(5, 3);
      console.log("Result: " + r);
 });
@@ -132,8 +135,7 @@ api.connect(async () =>
  ``` csharp
 class Startup
 {
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env){
         //the MVC initialization, etc.
 
         //initialize web-sockets
