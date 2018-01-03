@@ -49,10 +49,12 @@ interface IProgressAPI
 class TaskAPI  //:ITaskAPI
 {
    public async Task<int> LongRunningTask(int a, int b) {
+   
       for (var p = 0; p <= 100; p += 5) {
          await Task.Delay(250);
          //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
-         await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
+         await RPC.For<IProgressAPI>(this)
+	          .CallAsync(x => x.WriteProgress((float)p / 100));
       }
 		
       return a + b;
@@ -88,7 +90,8 @@ Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None,
       .Wait(0);
 ...
 //make an RPC
-var r = await RPC.For<ITaskAPI>().CallAsync(x => LongRunningTask(5, 3)); 
+var r = await RPC.For<ITaskAPI>()
+                 .CallAsync(x => LongRunningTask(5, 3)); 
 Console.WriteLine("Result: " + r.First());
 
 /*
