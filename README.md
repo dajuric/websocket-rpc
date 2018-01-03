@@ -42,23 +42,23 @@ The server's *TaskAPI* has a function which during its execution updates progres
  //client's API contract
 interface IProgressAPI
 {
-   void WriteProgress(float progress);
+    void WriteProgress(float progress);
 }
 
 //server's API
 class TaskAPI  //:ITaskAPI
 {
-   public async Task<int> LongRunningTask(int a, int b) {
+    public async Task<int> LongRunningTask(int a, int b) {
    
-      for (var p = 0; p <= 100; p += 5) {
-         await Task.Delay(250);
-         //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
-         await RPC.For<IProgressAPI>(this)
-	          .CallAsync(x => x.WriteProgress((float)p / 100));
-      }
+       for (var p = 0; p <= 100; p += 5) {
+          await Task.Delay(250);
+          //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
+          await RPC.For<IProgressAPI>(this)
+	               .CallAsync(x => x.WriteProgress((float)p / 100));
+       }
 		
-      return a + b;
-   }
+       return a + b;
+    }
 }
 
 ...
@@ -138,7 +138,7 @@ api.connect(async () => {
  ``` csharp
 class Startup
 {
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env){
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
         //the MVC initialization, etc.
 
         //initialize web-sockets
