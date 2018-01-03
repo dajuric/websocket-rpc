@@ -88,6 +88,7 @@ interface ITaskAPI {
 Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None, 
                     (c, wc) => c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI()))
       .Wait(0);
+      
 ...
 //make an RPC
 var r = await RPC.For<ITaskAPI>()
@@ -135,6 +136,8 @@ api.connect(async () => {
  ``` 
  
 #### 3) ASP.NET Core
+ASP.NET support is provided by the WebSocketRPC.AspCore NuGet package. The initialization is done in a startup class in the Configure method. Everything the rest is the same.
+
  ``` csharp
 class Startup
 {
