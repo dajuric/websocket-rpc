@@ -120,7 +120,7 @@ File.WriteAllText("TaskAPI.js", code);
  **Client** (Javascript)
   ``` javascript
 //init API
-var api = new TaskAPI("ws://localhost:8001");
+var api = new TaskAPI("ws://localhost:8000");
 
 //implement the interface by extending the 'TaskAPI' object
 api.writeProgress = function (p) {
