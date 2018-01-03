@@ -41,27 +41,27 @@ The server's *TaskAPI* has a function which during its execution updates progres
  ``` csharp
 interface IProgressAPI
 {
-  void WriteProgress(float progress);
+   void WriteProgress(float progress);
 }
 
 class TaskAPI //:ITaskAPI
 {
-  public async Task<int> LongRunningTask(int a, int b)
-  {
-    for (var p = 0; p <= 100; p += 5)
-    {
-       await Task.Delay(250);
-       //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
-       await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
-    }
+   public async Task<int> LongRunningTask(int a, int b)
+   {
+      for (var p = 0; p <= 100; p += 5)
+      {
+         await Task.Delay(250);
+         //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
+         await RPC.For<IProgressAPI>(this).CallAsync(x => x.WriteProgress((float)p / 100));
+      }
 		
-    return a + b;
-  }
+      return a + b;
+   }
 }
 
 ...
 Server.ListenAsync(8000, CancellationToken.None, 
-                  (c, wc) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()))
+                   (c, wc) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()))
       .Wait(0);
  ``` 
  
@@ -81,7 +81,7 @@ interface ITaskAPI {
 ...
 Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None, 
                     (c, wc) => c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI()))
-       .Wait(0);
+      .Wait(0);
 ...
 var r = await RPC.For<ITaskAPI>().First().CallAsync(x => LongRunningTask(5, 3)); 
 Console.WriteLine("Result: " + r);
@@ -116,15 +116,15 @@ var api = new TaskAPI("ws://localhost:8001");
 //implement the interface by extending the 'TaskAPI' object
 api.writeProgress = function (p)
 {
-   console.log("Completed: " + p * 100 + "%");
-   return true;
+     console.log("Completed: " + p * 100 + "%");
+     return true;
 }
 
 //connect and excecute (when connection is opened)
 api.connect(async () => 
 {
-   var r = await api.longRunningTask(5, 3);
-   console.log("Result: " + r);
+     var r = await api.longRunningTask(5, 3);
+     console.log("Result: " + r);
 });
  ``` 
  
@@ -139,8 +139,7 @@ class Startup
         //initialize web-sockets
         app.UseWebSockets();
         //define route for a new connection and bind the API
-        app.MapWebSocketRPC("/taskService", 
-                            (httpCtx, c) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()));
+        app.MapWebSocketRPC("/taskAPI", (httpCtx, c) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()));
     }
 }  
  ```
