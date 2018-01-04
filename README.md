@@ -34,163 +34,124 @@ Implemented API, if used only for RPC, does not use anything from the library.
 
 Check the samples by following the link above. The snippets below demonstrate the base functionality.
 
-#### 1) .NET <-> .NET (raw messaging)
-The sample demonstrates communication between server and client using raw messaging. The server relays client messages.
+#### 1) .NET <-> .NET (RPC)
+The server's *TaskAPI* has a function which during its execution updates progress and reports it only to clients which called the method.
 
 **Server** (C#)
  ``` csharp
-Server.ListenAsync("http://localhost:8000/", CancellationToken.None, (c, wc) => 
+ //client's API contract
+interface IProgressAPI
 {
-    c.OnOpen  += ()                    => Task.Run(() => Console.WriteLine("Opened"));
-    c.OnClose += (status, description) => Task.Run(() => Console.WriteLine("Closed: " + description));
-    c.OnError += ex                    => Task.Run(() => Console.WriteLine("Error: " + ex.Message));     
-
-    c.OnReceive += msg                 => await c.SendAsync("Received: " + msg); //relay message
-})
-.Wait(0);
- ``` 
-
- **Client** (C#)
-  ``` csharp
-Client.ListenAsync("ws://localhost:8000/", CancellationToken.None, c => 
-{
-      c.OnOpen += () => await c.SendAsync("Hello from a client");
-},
-reconnectOnError: true)
-.Wait(0);
- ```
-{empty} . 
-
-
-#### 2) .NET <-> .NET (RPC)
-A data aggregator service is built. The server gets the multiple number sequences of each client and sums all the numbers.  
-The procedure is repeated for each new client connection.
-
-**Server** (C#)
- ``` csharp
-//client API contract
-interface IClientAPI
-{
-    int[] GetLocalNumbers();
+    void WriteProgress(float progress);
 }
 
-....
-async Task WriteTotalSum()
-{  
-    //get all the clients (notice there is no 'this' (the sample above))
-    var clients = RPC.For<IClientAPI>();
-
-    //get the numbers sequences
-    var numberGroups = await clients.CallAsync(x => x.GetLocalNumbers());
-    //flatten the collection and sum all the elements
-    var sum = numberGroups.SelectMany(x => x).Sum();
-
-    Console.WriteLine("Client count: {0}; sum: {1}.", clients.Count(), sum);
+//server's API
+class TaskAPI  //:ITaskAPI
+{
+    public async Task<int> LongRunningTask(int a, int b) {
+   
+       for (var p = 0; p <= 100; p += 5) {
+          await Task.Delay(250);
+          //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
+          await RPC.For<IProgressAPI>(this)
+	               .CallAsync(x => x.WriteProgress((float)p / 100));
+       }
+		
+       return a + b;
+    }
 }
 
-//run server
-Server.ListenAsync("http://localhost:8000/", CancellationToken.None, 
-                   (c, wc) => 
-                   { 
-                       c.Bind<IClientAPI>();
-                       c.OnOpen += WriteTotalSum;
-                   })
-                   .Wait(0);
-
-/*
-Output: 
-   Client count: 1; sum: 4.
-   Client count: 3; sum: 14.
-   ...
-*/
+...
+//run the server and bind the local and remote API to a connection
+Server.ListenAsync(8000, CancellationToken.None, 
+                   (c, wc) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()))
+       .Wait(0);
  ``` 
  
 **Client** (C#)
 ``` csharp
-//client API
-class ClientAPI
+//client's API
+class ProgressAPI //:IProgressAPI
 {
-    int[] GetLocalNumbers()
-    {
-       var r = new Random();
-      
-       var numbers = new int[10];
-       for(var i = 0; i < numbers.Length; i++)
-          numbers[i] = r.Next();
-
-       return numbers;
-    }
+   void WriteProgress(float progress) {
+       Console.Write("Completed: " + progress * 100 + "%\r");
+   }
 }
 
-....
-//run client
-Client.ListenAsync("ws://localhost:8000/", CancellationToken.None, 
-                   c => c.Bind(new ClientAPI())).Wait(0);
- ``` 
-{empty} .  
+//server's API contract
+interface ITaskAPI {
+   Task<int> LongRunningTask(int a, int b);
+}
 
-#### 3) .NET <-> Javascript (RPC)
-Simple math service is built and invoked remotely. The math service has a single long running method which adds two numbers (server side).
-Client calls the method and receives progress update until the result does not become available.
+...
+//run the client and bind the APIs to the connection
+Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None, 
+                    (c, wc) => c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI()))
+      .Wait(0);
+      
+...
+//make an RPC
+var r = await RPC.For<ITaskAPI>()
+                 .CallAsync(x => LongRunningTask(5, 3)); 
+Console.WriteLine("Result: " + r.First());
+
+/*
+ Output:
+   Completed: 0%
+   Completed: 5%
+     ...
+   Completed: 100%
+   Result: 8
+*/ 
+ ``` 
+
+#### 2) .NET <-> Javascript (RPC)
+Let us use the same server implementation as in the two-way binding sample, but this time the client will be written in JavaScript.
 
 **Server** (C#)
  ``` csharp
-//client API contract
-interface IReportAPI
-{
-    void WriteProgress(int progress);
-}
+//the server code is the same as in the previous sample
 
-//server API
-class MathAPI
-{
-    public async Task<int> LongRunningTask(int a, int b)
-    {
-        for (var p = 0; p <= 100; p += 5)
-        {
-            await Task.Delay(250);
-            //update only the client which called this method (hence 'this')
-            await RPC.For<IReportAPI>(this).CallAsync(x => x.WriteProgress(p));
-        }
-
-        return a + b;
-    }
-}
-
-....
-//generate js code with JsDoc documentation taken from XML comments (if any)
-File.WriteAllText("MathAPI.js", RPCJs.GenerateCallerWithDoc<MathAPI>());
-//run server
-Server.ListenAsync("http://localhost:8000/", CancellationToken.None, 
-                    (c, wc) => c.Bind<MathAPI, IReportAPI>(new MathAPI())).Wait(0);
+//generate JavaScript client (file)
+var code = RPCJs.GenerateCallerWithDoc<TaskAPI>();
+File.WriteAllText("TaskAPI.js", code);
  ``` 
 
  **Client** (Javascript)
   ``` javascript
-//init 'MathAPI'
-var api = new MathAPI("ws://localhost:8000");
-//implement the 'IReportAPI'
-api.writeProgress = p => console.log("Progress: " + p + "%");
+//init API
+var api = new TaskAPI("ws://localhost:8000");
 
-//connect to the server and call the remote function
-api.connect(async () => 
-{
-    var r = await api.longRunningTask(5, 3);
-    console.log("Result: " + r);
+//implement the interface by extending the 'TaskAPI' object
+api.writeProgress = function (p) {
+     console.log("Completed: " + p * 100 + "%");
+     return true;
+}
+
+//connect and excecute (when connection is opened)
+api.connect(async () => {
+     var r = await api.longRunningTask(5, 3);
+     console.log("Result: " + r);
 });
-
-/*
-  Output: 
-     Progress: 0 %
-     Progress: 5 %
-     Progress: 10 %
-     ...
-     Result: 8
-*/
  ``` 
-  
-{empty} .  
+ 
+#### 3) ASP.NET Core
+ASP.NET support is provided by the WebSocketRPC.AspCore NuGet package. The initialization is done in a startup class in the Configure method. Everything the rest is the same.
 
+ ``` csharp
+class Startup
+{
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+        //the MVC initialization, etc.
+
+        //initialize web-sockets
+        app.UseWebSockets();
+        //define route for a new connection and bind the API
+        app.MapWebSocketRPC("/taskAPI", (httpCtx, c) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()));
+    }
+}  
+ ```
+  
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
 + questions, comments - Github
