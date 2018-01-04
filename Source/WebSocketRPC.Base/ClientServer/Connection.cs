@@ -134,8 +134,8 @@ namespace WebSocketRPC
             {
                 var members = OnError.GetInvocationList().Cast<Func<Exception, Task>>();
 
-                Task.WhenAll(members.Select(x => x(exception)))
-                    .Wait(0);
+                Task.WhenAll(members.Select(x => x(exception)));
+                    //.Wait(0);
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
@@ -150,9 +150,9 @@ namespace WebSocketRPC
             {
                 var members = OnOpen.GetInvocationList().Cast<Func<Task>>();
 
-                Task.WhenAll(members.Select(x=> x()))
-                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
-                    .Wait(0);
+                Task.WhenAll(members.Select(x => x()))
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                    //.Wait(0);
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
@@ -168,8 +168,8 @@ namespace WebSocketRPC
                 var members = OnReceive.GetInvocationList().Cast<Func<string, Task>>();
 
                 Task.WhenAll(members.Select(x => x(msg)))
-                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
-                    .Wait(0);
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                    //.Wait(0); //throws TaskCanceledException -> why ?
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
@@ -185,8 +185,8 @@ namespace WebSocketRPC
                 var members = OnClose.GetInvocationList().Cast<Func< WebSocketCloseStatus, string, Task >>();
 
                 Task.WhenAll(members.Select(x => x(closeStatus, statusDescription)))
-                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted)
-                    .Wait(0);
+                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                    //.Wait(0);
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }

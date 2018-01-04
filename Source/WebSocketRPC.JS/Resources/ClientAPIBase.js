@@ -40,9 +40,12 @@ function onCallRequest(data, onError)
         return;
     }
 
-    var r = obj[jsonFName].apply(obj, data.Arguments);
-    if (r === undefined) r = true;
-    ws.send(JSON.stringify({ FunctionName: data.FunctionName, CallId: data.CallId, ReturnValue: r })); //TODO: error ?
+    var r = null, errMsg = null;
+    try { obj[jsonFName].apply(obj, data.Arguments); }
+    catch (e) { errMsg = e; }
+
+    if (r === null || r === undefined) r = true;
+    ws.send(JSON.stringify({ FunctionName: data.FunctionName, CallId: data.CallId, ReturnValue: r, Error: errMsg })); //TODO: error ?
 }
 
 function getAllFunctions(obj)
