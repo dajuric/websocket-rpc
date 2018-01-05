@@ -42,7 +42,7 @@ namespace WebSocketRPC
     {
         /// <summary>
         /// Creates and starts a new instance of the http(s) / websocket server.
-		/// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
+        /// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
         /// <param name="port">The http/https URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
@@ -67,14 +67,15 @@ namespace WebSocketRPC
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
         /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
+        /// <param name="maxHttpConnectionCount">Maximum HTTP connection count, after which the incoming requests will wait.</param>
         /// <returns>Server listening task.</returns>
-        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, bool useHttps = false)
+        public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, bool useHttps = false, byte maxHttpConnectionCount = 32)
         {
             if (port < 0 || port > UInt16.MaxValue)
                 throw new NotSupportedException($"The provided port value must in the range: [0..{UInt16.MaxValue}");
 
             var s = useHttps ? "s" : String.Empty;
-            await ListenAsync($"http{s}://+:{port}/", token, onConnect, onHttpRequestAsync);
+            await ListenAsync($"http{s}://+:{port}/", token, onConnect, onHttpRequestAsync, maxHttpConnectionCount);
         }
 
 
@@ -103,9 +104,11 @@ namespace WebSocketRPC
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
+        /// <param name="maxHttpConnectionCount">Maximum HTTP connection count, after which the incoming requests will wait.</param>
         /// <returns>Server listening task.</returns>
-        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
+        public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, byte maxHttpConnectionCount = 32)
         {
+            //--------------------- checks args
             if (token == null)
                 throw new ArgumentNullException(nameof(token), "The provided token must not be null.");
 
@@ -115,7 +118,11 @@ namespace WebSocketRPC
             if (onHttpRequestAsync == null)
                 throw new ArgumentNullException(nameof(onHttpRequestAsync), "The provided HTTP request/response action must not be null.");
 
+            if (maxHttpConnectionCount < 1)
+                throw new ArgumentException(nameof(maxHttpConnectionCount), "The value must be greater or equal than 1.");
 
+
+            //--------------------- start listener
             var listener = new HttpListener();
             try { listener.Prefixes.Add(httpListenerPrefix); }
             catch (Exception ex) { throw new ArgumentException("The provided prefix is not supported. Prefixes have the format: 'http(s)://+:(port)/'", ex); }
@@ -127,8 +134,9 @@ namespace WebSocketRPC
                 throw new UnauthorizedAccessException(msg, ex);
             }
 
-			//helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks
-			//         https://github.com/NancyFx/Nancy/blob/815b6fdf42a5a8c61e875501e305382f46cec619/src/Nancy.Hosting.Self/HostConfiguration.cs
+            //helpful: https://stackoverflow.com/questions/11167183/multi-threaded-httplistener-with-await-async-and-tasks
+            //         https://github.com/NancyFx/Nancy/blob/815b6fdf42a5a8c61e875501e305382f46cec619/src/Nancy.Hosting.Self/HostConfiguration.cs
+            using (var s = new SemaphoreSlim(maxHttpConnectionCount))
             using (var r = token.Register(() => closeListener(listener)))
             {
                 bool shouldStop = false;
@@ -139,9 +147,17 @@ namespace WebSocketRPC
                         var ctx = await listener.GetContextAsync();
 
                         if (ctx.Request.IsWebSocketRequest)
-                            Task.Factory.StartNew(() => listenAsync(ctx, token, onConnect),       TaskCreationOptions.LongRunning).Wait(0);
+                        {
+                            Task.Factory.StartNew(() => handleSocketAsync(ctx, token, onConnect), TaskCreationOptions.LongRunning)
+                                        .Wait(0);
+                        }
                         else
-                            Task.Factory.StartNew(() => listenHttpAsync(ctx, onHttpRequestAsync), TaskCreationOptions.None).Wait(0);
+                        {
+                            await s.WaitAsync();
+                            Task.Factory.StartNew(() => handleHttpAsync(ctx, onHttpRequestAsync), TaskCreationOptions.None)
+                                        .ContinueWith(t => s.Release())
+                                        .Wait(0);
+                        }
                     }
                     catch (Exception)
                     {
@@ -193,14 +209,14 @@ namespace WebSocketRPC
             connections.Clear();
         }
 
-        static async Task listenHttpAsync(HttpListenerContext ctx, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequest)
+        static async Task handleHttpAsync(HttpListenerContext ctx, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync)
         {
-            await onHttpRequest(ctx.Request, ctx.Response);
+            await onHttpRequestAsync(ctx.Request, ctx.Response);
             ctx.Response.Close();
         }
 
         static List<Connection> connections = new List<Connection>();
-        static async Task listenAsync(HttpListenerContext ctx, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
+        static async Task handleSocketAsync(HttpListenerContext ctx, CancellationToken token, Action<Connection, WebSocketContext> onConnect)
         {
             if (!ctx.Request.IsWebSocketRequest)
                 return;

@@ -12,7 +12,7 @@
 	</ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.JS.xml</DocumentationFile>
+    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.Js.xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
