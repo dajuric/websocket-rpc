@@ -40,7 +40,7 @@ The server's *TaskAPI* has a function which during its execution updates progres
 **Server** (C#)
  ``` csharp
  //client's API contract
-interface IProgressAPI
+interface IProgressAPI 
 {
     void WriteProgress(float progress);
 }
@@ -48,9 +48,10 @@ interface IProgressAPI
 //server's API
 class TaskAPI  //:ITaskAPI
 {
-    public async Task<int> LongRunningTask(int a, int b) {
-   
-       for (var p = 0; p <= 100; p += 5) {
+    public async Task<int> LongRunningTask(int a, int b) 
+    {
+       for (var p = 0; p <= 100; p += 5) 
+       {
           await Task.Delay(250);
           //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
           await RPC.For<IProgressAPI>(this)
@@ -79,7 +80,8 @@ class ProgressAPI //:IProgressAPI
 }
 
 //server's API contract
-interface ITaskAPI {
+interface ITaskAPI 
+{
    Task<int> LongRunningTask(int a, int b);
 }
 
@@ -141,7 +143,8 @@ ASP.NET support is provided by the WebSocketRPC.AspCore NuGet package. The initi
  ``` csharp
 class Startup
 {
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env) 
+    {
         //the MVC initialization, etc.
 
         //initialize web-sockets
