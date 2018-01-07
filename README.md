@@ -20,138 +20,106 @@ Lightweight .NET framework for making RPC over websockets. Supports full duplex 
 The only dependency is <a href="https://www.newtonsoft.com/json">JSON.NET</a> library used for serialization/deserialization.
 
 + **Simple**   
-There are two relevant method: **Bind** for binding object/interface onto connection, and **CallAsync** for making RPCs.
+There are only two relevant methods: **Bind** for binding object/interface onto a connection, and **CallAsync** for making RPCs.
 
 + **Use 3rdParty assemblies as API(s)**   
-Implemented API, if used only for RPC, does not use anything from the library.
+Implemented API, *if used only for RPC*, does not use anything from the library.
 
-+ **Automatic Javascript code generation** *(WebSocketRPC.JS package)*  
- Javascript websocket client code is automatically generated **_(with JsDoc comments)_** from an existing .NET
-                        interface (API contract).
++ **Automatic JavaScript code generation**  
+ The JavaScript WebSocket client code is automatically generated **_(with JsDoc comments)_** from an existing .NET interface (API contract).
 
  
 ## <a href="Samples/"> Samples</a>
 
 Check the samples by following the link above. The snippets below demonstrate the base functionality.
 
-#### 1) .NET <-> .NET (RPC)
-The server's *TaskAPI* has a function which during its execution updates progress and reports it only to clients which called the method.
+#### 1) .NET <- .NET (RPC)
+The server implements a math API containing a single function.
 
 **Server** (C#)
  ``` csharp
- //client's API contract
-interface IProgressAPI
-{
-    void WriteProgress(float progress);
-}
-
 //server's API
-class TaskAPI  //:ITaskAPI
+class MathAPI //:IMathAPI
 {
-    public async Task<int> LongRunningTask(int a, int b) {
-   
-       for (var p = 0; p <= 100; p += 5) {
-          await Task.Delay(250);
-          //select only those connections which are associated with 'IProgressAPI' and with 'this' object.
-          await RPC.For<IProgressAPI>(this)
-	               .CallAsync(x => x.WriteProgress((float)p / 100));
-       }
-		
-       return a + b;
-    }
+     public int Add(int a, int b)
+     {
+         return a + b;
+     }
 }
 
 ...
 //run the server and bind the local and remote API to a connection
 Server.ListenAsync(8000, CancellationToken.None, 
-                   (c, wc) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()))
+                    (c, wc) => c.Bind<MathAPI>(new MathAPI()))
        .Wait(0);
  ``` 
  
 **Client** (C#)
 ``` csharp
-//client's API
-class ProgressAPI //:IProgressAPI
-{
-   void WriteProgress(float progress) {
-       Console.Write("Completed: " + progress * 100 + "%\r");
-   }
-}
-
 //server's API contract
-interface ITaskAPI {
-   Task<int> LongRunningTask(int a, int b);
+interface IMathAPI
+{
+    int Add(int a, int b);
 }
 
 ...
 //run the client and bind the APIs to the connection
 Client.ConnectAsync("ws://localhost:8000/", CancellationToken.None, 
-                    (c, wc) => c.Bind<ProgressAPI, ITaskAPI>(new ProgressAPI()))
+                    (c, ws) => c.Bind<IMathAPI>())
       .Wait(0);
       
 ...
-//make an RPC
-var r = await RPC.For<ITaskAPI>()
-                 .CallAsync(x => LongRunningTask(5, 3)); 
-Console.WriteLine("Result: " + r.First());
-
-/*
- Output:
-   Completed: 0%
-   Completed: 5%
-     ...
-   Completed: 100%
-   Result: 8
-*/ 
+//make an RPC (there is only one connection)
+var r = await RPC.For<IMathAPI>().CallAsync(x => Add(5, 3)); 
+Console.WriteLine("Result: " + r.First()); //Output: 'Result: 8'
  ``` 
 
-#### 2) .NET <-> Javascript (RPC)
-Let us use the same server implementation as in the two-way binding sample, but this time the client will be written in JavaScript.
+#### 2) .NET <- Javascript (RPC)
+The server's code is the same, but the client is written in JavaScript. The support is given by the *WebSocketRPC.JS* package.
 
 **Server** (C#)
  ``` csharp
 //the server code is the same as in the previous sample
 
 //generate JavaScript client (file)
-var code = RPCJs.GenerateCallerWithDoc<TaskAPI>();
-File.WriteAllText("TaskAPI.js", code);
+var code = RPCJs.GenerateCallerWithDoc<MathAPI>();
+File.WriteAllText("MathAPI.js", code);
  ``` 
 
  **Client** (Javascript)
   ``` javascript
 //init API
-var api = new TaskAPI("ws://localhost:8000");
-
-//implement the interface by extending the 'TaskAPI' object
-api.writeProgress = function (p) {
-     console.log("Completed: " + p * 100 + "%");
-     return true;
-}
+var api = new MathAPI("ws://localhost:8000");
 
 //connect and excecute (when connection is opened)
 api.connect(async () => {
-     var r = await api.longRunningTask(5, 3);
+     var r = await api.add(5, 3);
      console.log("Result: " + r);
 });
  ``` 
  
 #### 3) ASP.NET Core
-ASP.NET support is provided by the WebSocketRPC.AspCore NuGet package. The initialization is done in a startup class in the Configure method. Everything the rest is the same.
+To incorporate server's code into the ASP.NET Core use *WebSocketRPC.AspCore* package. The initialization is done in a startup class in the *Configure* method. Everything the rest is the same.
 
  ``` csharp
 class Startup
 {
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
-        //the MVC initialization, etc.
+     public void Configure(IApplicationBuilder app, IHostingEnvironment env) 
+     {
+         //the MVC initialization, etc.
 
-        //initialize web-sockets
-        app.UseWebSockets();
-        //define route for a new connection and bind the API
-        app.MapWebSocketRPC("/taskAPI", (httpCtx, c) => c.Bind<TaskAPI, IProgressAPI>(new TaskAPI()));
-    }
+         //initialize web-sockets
+         app.UseWebSockets();
+         //define route for a new connection and bind the API
+         app.MapWebSocketRPC("/mathAPI", (httpCtx, c) => c.Bind<MathAPI>(new MathAPI()));
+     }
 }  
  ```
   
+## Related Libraries
+<a href="https://github.com/dajuric/simple-http" target="_blank">SimpleHTTP library</a>
+
+
 ## How to Engage, Contribute and Provide Feedback  
 Remember: Your opinion is important and will define the future roadmap.
 + questions, comments - Github
