@@ -176,7 +176,7 @@ namespace WebSocketRPC
 
         static string getTypeName(Type type)
         {
-            if (type.GetGenericTypeDefinition() != typeof(Task<>))
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Task<>))
                 return type.Name;
 
             return type.GenericTypeArguments.First().Name + " (Task)";
