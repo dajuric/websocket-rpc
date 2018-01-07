@@ -15,7 +15,7 @@
 	</ItemGroup>
   
     <ItemGroup>
-      <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.Js.csproj" />
+      <ProjectReference Include="..\..\Source\WebSocketRPC.JS\WebSocketRPC.JS.csproj" />
       <ProjectReference Include="..\..\Source\WebsocketRPC.Standalone\WebsocketRPC.Standalone.csproj" />
     </ItemGroup>
   

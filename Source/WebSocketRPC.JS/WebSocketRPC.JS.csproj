@@ -12,7 +12,7 @@
 	</ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.JS.xml</DocumentationFile>
+    <DocumentationFile>bin\$(TargetFramework)\WebsocketRPC.Js.xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
@@ -25,7 +25,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/dajuric/websocket-rpc/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dajuric/websocket-rpc/</RepositoryUrl>
-    <PackageTags>websocket; websocket-client; Javascript; RPC; C#; .NET</PackageTags>
+    <PackageTags>websocket; websocket-client; JavaScript; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
     <Version>1.0.0</Version>

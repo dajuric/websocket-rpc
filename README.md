@@ -1,9 +1,9 @@
 <p align="center">
-    <a href="https://www.nuget.org/profiles/dajuric"> <img src="Deploy/Logo/Logo-big.png" alt="WebSocketRPC logo" width="120" align="center"> </a>
+    <img src="Deploy/Logo/Logo-big.png" alt="WebSocketRPC logo" width="120" align="center" />
 </p>
 
 <p align="center">
-    <a href="https://www.nuget.org/packages/WebsocketRPC/"> <img src="https://img.shields.io/badge/WebSokcetRPC-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
+    <a href="https://www.nuget.org/packages/WebsocketRPC.Standalone/"> <img src="https://img.shields.io/badge/WebSokcetRPC.Standalone-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
     <a href="https://www.nuget.org/packages/WebsocketRPC.JS/"> <img src="https://img.shields.io/badge/WebSokcetRPC.JS-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
     <a href="https://www.nuget.org/packages/WebsocketRPC.AspCore/"> <img src="https://img.shields.io/badge/WebSokcetRPC.AspCore-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
 </p>
@@ -31,9 +31,9 @@ Implemented API, *if used only for RPC*, does not use anything from the library.
  
 ## <a href="Samples/"> Samples</a>
 
-Check the samples by following the link above. The snippets below demonstrate the base functionality.
+Check the samples by following the link above. The snippets below demonstrate the base RPC functionality.
 
-#### 1) .NET <- .NET (RPC)
+#### 1) .NET <- .NET
 The server implements a math API containing a single function.
 
 **Server** (C#)
@@ -74,7 +74,7 @@ var r = await RPC.For<IMathAPI>().CallAsync(x => Add(5, 3));
 Console.WriteLine("Result: " + r.First()); //Output: 'Result: 8'
  ``` 
 
-#### 2) .NET <- Javascript (RPC)
+#### 2) .NET <- Javascript
 The server's code is the same, but the client is written in JavaScript. The support is given by the *WebSocketRPC.JS* package.
 
 **Server** (C#)
