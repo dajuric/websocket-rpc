@@ -74,7 +74,7 @@ var r = await RPC.For<IMathAPI>().CallAsync(x => Add(5, 3));
 Console.WriteLine("Result: " + r.First()); //Output: 'Result: 8'
  ``` 
 
-#### 2) .NET <- Javascript
+#### 2) .NET <- JavaScript
 The server's code is the same, but the client is written in JavaScript. The support is given by the *WebSocketRPC.JS* package.
 
 **Server** (C#)
@@ -86,7 +86,7 @@ var code = RPCJs.GenerateCallerWithDoc<MathAPI>();
 File.WriteAllText("MathAPI.js", code);
  ``` 
 
- **Client** (Javascript)
+ **Client** (JavaScript)
   ``` javascript
 //init API
 var api = new MathAPI("ws://localhost:8000");
@@ -117,7 +117,7 @@ class Startup
  ```
   
 ## Related Libraries
-<a href="https://github.com/dajuric/simple-http" target="_blank">SimpleHTTP library</a>
+<a href="https://github.com/dajuric/simple-http" target="_blank">SimpleHTTP library</a> - adds the HTTP listener functionality <a href="https://www.codeproject.com/Articles/1210957/Introducing-Lightweight-WebSocket-RPC-Library-for#httpSupport">(see the article)</a>.
 
 
 ## How to Engage, Contribute and Provide Feedback  
