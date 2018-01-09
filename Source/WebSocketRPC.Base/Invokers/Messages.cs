@@ -38,20 +38,30 @@ namespace WebSocketRPC
 
         public static Request FromJson(string json)
         {
+            //---try parsing JSON
             JObject root = null;
             try { root = JObject.Parse(json); }
             catch { return default(Request); }
 
-            var r = new Request
+            //---try deserialize JSON
+            var r = default(Request);
+            try
             {
-                FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                CallId       = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
-                Arguments    = root[nameof(Arguments)]?.Children().ToArray()
-            };
+                r = new Request
+                {
+                    FunctionName = root[nameof(FunctionName)]?.Value<string>(),
+                    CallId = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
+                    Arguments = root[nameof(Arguments)]?.Children().ToArray()
+                };
+            }
+            catch (Exception ex)
+            { throw new JsonSerializationException($"Error deserializing the request: '{json}'.", ex); }
 
+            //---verify JSON
             if (r.FunctionName == null || r.Arguments == null)
                 return default(Request);
 
+            //---return it if all is OK
             return r;
         }
 
@@ -72,21 +82,31 @@ namespace WebSocketRPC
 
         public static Response FromJson(string json)
         {
+            //---try parsing JSON
             JObject root = null;
             try { root = JObject.Parse(json); }
             catch { return default(Response); }
 
-            var r = new Response
+            //---try deserialize JSON
+            var r = default(Response);
+            try
             {
-                FunctionName = root[nameof(FunctionName)]?.Value<string>(),
-                CallId       = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
-                ReturnValue  = root[nameof(ReturnValue)]?.Value<JToken>(),
-                Error        = root[nameof(Error)]?.Value<string>()
-            };
+                r = new Response
+                {
+                    FunctionName = root[nameof(FunctionName)]?.Value<string>(),
+                    CallId = root[nameof(CallId)]?.Value<string>() ?? Guid.Empty.ToString(),
+                    ReturnValue = root[nameof(ReturnValue)]?.Value<JToken>(),
+                    Error = root[nameof(Error)]?.Value<string>()
+                };
+            }
+            catch (Exception ex)
+            { throw new JsonSerializationException($"Error deserializing the response: '{json}'.", ex); }
 
+            //---verify JSON
             if (r.FunctionName == null || r.ReturnValue == null)
                 return default(Response);
 
+            //---return it if all is OK
             return r;
         }
 

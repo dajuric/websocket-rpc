@@ -27,7 +27,7 @@
     <Copyright>Darko Jurić</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/dajuric/websocket-rpc/</PackageProjectUrl>
+    <PackageProjectUrl>http://websocket-rpc.net/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dajuric/websocket-rpc/</RepositoryUrl>
     <PackageTags>websocket; ASP.NET; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
