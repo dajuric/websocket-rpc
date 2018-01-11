@@ -1,6 +1,6 @@
 ﻿//auto-generated using WebSocketRPC.JS library
 
-//from client
+//-----outgoing RPCs
 var registeredFunctions = [];
 function callRPC(funcName, funcArgVals)
 {
@@ -29,7 +29,7 @@ function onRPCResponse(data)
         registeredFunctions[data.FunctionName].OnReturn(data.ReturnValue);
 }
 
-//to client
+//-----incoming RPCs
 function onCallRequest(data, onError)
 {
     var jsonFName = data.FunctionName[0].toLowerCase() + data.FunctionName.substring(1);
@@ -60,7 +60,7 @@ function getAllFunctions(obj)
     return funcs;
 }
 
-//common
+//-----common
 function onMessage(msg, onError)
 {
     var data = null;
@@ -76,6 +76,9 @@ function onMessage(msg, onError)
     else if (obj.onOtherMessage)
         obj.onOtherMessage(msg.data);
 }
+
+
+//-----public methods
 
 /**
 * {Establishes the connection with the web-socket server.}

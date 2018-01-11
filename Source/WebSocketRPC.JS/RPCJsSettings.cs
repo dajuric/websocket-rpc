@@ -30,14 +30,14 @@ using System.Text.RegularExpressions;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// RPC-Js settings used for Javascript code generation.
+    /// RPC-Js settings used for JavaScript code generation.
     /// </summary>
     /// <typeparam name="T">Class or interface type.</typeparam>
     public class RPCJsSettings<T>
     {
         Expression<Action<T>>[] omittedMethods = new Expression<Action<T>>[0];
         /// <summary>
-        /// Gets or sets the methods of the class / interface that should be omitted when creating the Javascript code.
+        /// Gets or sets the methods of the class / interface that should be omitted when creating the JavaScript code.
         /// </summary>
         public Expression<Action<T>>[] OmittedMethods
         {
@@ -52,13 +52,13 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// if true the 'require.js' header will be present in the generated files.
+        /// If true the 'require.js' header will be present in the generated files.
         /// </summary>
         public bool WithRequireSupport { get; set; }
 
         string nameOverwrite = null;
         /// <summary>
-        /// Javascript API name. If null, the name is the same as the corresponding .NET type name.
+        /// JavaScript API name. If null, the name is the same as the corresponding .NET type name.
         /// </summary>
         public string NameOverwrite
         {

@@ -6,7 +6,7 @@ using System.Timers;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// Timeout binder.
+    /// Represents a timeout binder which closes a connection after a specified timeout is due.
     /// </summary>
     class TimeoutBinder
     {
@@ -18,10 +18,13 @@ namespace WebSocketRPC
         /// Creates new timeout binder.
         /// </summary>
         /// <param name="connection">Connection.</param>
-        /// <param name="timeout">Idle timeout.</param>
+        /// <param name="timeout">Idle timeout which is reset on each received message.</param>
         /// <param name="closeMessage">Close message.</param>
         public TimeoutBinder(Connection connection, TimeSpan timeout, string closeMessage)
         {
+            if (timeout.TotalMilliseconds <= 0)
+                throw new ArgumentException(nameof(timeout), "The value must be strictly positive.");
+
             this.connection = connection;
             this.closeMessage = closeMessage;
 
@@ -54,6 +57,7 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Binds a new idle-timeout binder to the provided connection.
+        /// <para>A timeout binder closes a connection after a specified timeout is due.</para>
         /// </summary>
         /// <param name="connection">Connection.</param>
         /// <param name="timeout">Idle-timeout. Interval is reset on each received message.</param>

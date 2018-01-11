@@ -34,7 +34,7 @@ using System.Threading.Tasks;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// Provides methods for invoking the RPC.
+    /// Class providing methods for invoking the RPC.
     /// </summary>
     public static class RPC
     {
@@ -58,14 +58,14 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Gets the messaging serializer.
+        /// Gets the message serializer.
         /// </summary>
         internal static readonly JsonSerializer Serializer = JsonSerializer.Create(new JsonSerializerSettings { ContractResolver = new CamelCaseExceptDictionaryKeysResolver() });
 
         /// <summary>
-        /// Adds the serialization type converter.
+        /// Adds the JSON converter responsible for the serialization/deserialization of the function arguments and return values (if any).
         /// </summary>
-        /// <param name="converter">Converter.</param>
+        /// <param name="converter">JSON converter.</param>
         public static void AddConverter(JsonConverter converter)
         {
             Serializer.Converters.Add(converter);
@@ -83,12 +83,12 @@ namespace WebSocketRPC
         #region Bind
 
         /// <summary>
-        /// Creates one way RPC receiving binding for the provided connection.
+        /// Enables incoming RPC messages to invoke methods of the provided object by creating one-way local binding. 
         /// </summary>
         /// <typeparam name="TObj">Object type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
-        /// <param name="obj">Object to bind to.</param>
-        /// <returns>Binder.</returns>
+        /// <param name="obj">Object which methods will be invoked remotely.</param>
+        /// <returns>Local binder which associates the object and the connection.</returns>
         public static ILocalBinder<TObj> Bind<TObj>(this Connection connection, TObj obj)
         { 
             if (AllBinders.ToArray().OfType<ILocalBinder<TObj>>().Any(x => x.Connection == connection))
@@ -98,11 +98,11 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Creates one way RPC sending binding for the provided connection.
+        /// Enables outgoing RPC messages to be sent using the provided connection by creating one-way remote binding.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
-        /// <returns>Binder.</returns>
+        /// <returns>Remote binder which translates .NET calls to JSON RPC messages.</returns>
         public static IRemoteBinder<TInterface> Bind<TInterface>(this Connection connection)
         {
             if (AllBinders.ToArray().OfType<IRemoteBinder<TInterface>>().Any(x => x.Connection == connection))
@@ -112,14 +112,14 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Creates two way RPC sending binding for the provided connection.
-        /// <para>Shorthand for binding local and remote binder separately.</para>
+        /// Enables full-duplex RPC messaging between the provided object and the remote API which has a <typeparamref name="TInterface"/> contract.
+        /// <para>It is a shorthand for assigning a local and a remote binder separately.</para>
         /// </summary>
         /// <typeparam name="TObj">Object type.</typeparam>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="connection">Existing connection to bind to.</param>
-        /// <param name="obj">The object to bind with the connection.</param>
-        /// <returns>Local and remote binder.</returns>
+        /// <param name="obj">Object which methods will be invoked remotely.</param>
+        /// <returns>Local and remote binder which associate the connection with the object and the remote interface.</returns>
         public static (ILocalBinder<TObj>, IRemoteBinder<TInterface>) Bind<TObj, TInterface>(this Connection connection, TObj obj)
         {
             return (connection.Bind(obj), connection.Bind<TInterface>());
@@ -152,7 +152,7 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Gets all remote binders which connection also have local binder(s) associated with the specified object.
+        /// Gets all remote binders which connection also has a local binder associated with the specified object.
         /// </summary>
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="obj">Target object.</param>
@@ -191,7 +191,7 @@ namespace WebSocketRPC
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
-        /// <returns>The RPC task.</returns>
+        /// <returns>RPC waiting task.</returns>
         public static async Task CallAsync<TInterface>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Action<TInterface>> functionExpression)
         {
             var tasks = new List<Task>();
@@ -211,7 +211,7 @@ namespace WebSocketRPC
         /// <typeparam name="TResult">Method result type.</typeparam>
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
-        /// <returns>The collection of results.</returns>
+        /// <returns>A task representing RPC waiting task. The result is the collection of return values for each called method instance.</returns>
         public static async Task<TResult[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, TResult>> functionExpression)
         {
             var tasks = new List<Task<TResult>>();
@@ -235,7 +235,7 @@ namespace WebSocketRPC
         /// <typeparam name="TInterface">Interface type.</typeparam>
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
-        /// <returns>The RPC task.</returns>
+        /// <returns>RPC waiting task.</returns>
         public static async Task CallAsync<TInterface>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task>> functionExpression)
         {
             var tasks = new List<Task>();
@@ -255,7 +255,7 @@ namespace WebSocketRPC
         /// <typeparam name="TResult">Method result type.</typeparam>
         /// <param name="binders">Remote binder collection.</param>
         /// <param name="functionExpression">Method getter.</param>
-        /// <returns>The collection of results.</returns>
+        /// <returns>A task representing RPC waiting task. The result is the collection of return values for each called method instance.</returns>
         public static async Task<TResult[]> CallAsync<TInterface, TResult>(this IEnumerable<IRemoteBinder<TInterface>> binders, Expression<Func<TInterface, Task<TResult>>> functionExpression)
         {
             var tasks = new List<Task<TResult>>();
@@ -280,9 +280,10 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Gets whether the data contain RPC message or not.
+        /// <para>Useful for filtering incoming messages if both user and RPC messages are sent/received.</para>
         /// </summary>
         /// <param name="message">Received data.</param>
-        /// <returns>True if the data contain RPC message, false otherwise.</returns>
+        /// <returns>True if the data contains RPC message, false otherwise.</returns>
         public static bool IsRpcMessage(string message)
         {
             return !Request.FromJson(message).IsEmpty || !Response.FromJson(message).IsEmpty;

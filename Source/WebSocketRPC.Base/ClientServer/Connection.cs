@@ -35,7 +35,7 @@ using System.Linq;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// Represents the websocket connection.
+    /// Represents a websocket connection.
     /// </summary>
     public class Connection
     {
@@ -81,10 +81,10 @@ namespace WebSocketRPC
         TaskQueue sendTaskQueue;
 
         /// <summary>
-        /// Creates new connection.
+        /// Creates a new connection.
         /// </summary>
         /// <param name="socket">Web-socket.</param>
-        /// <param name="cookies">Cookies.</param>
+        /// <param name="cookies">Cookie key-value pairs.</param>
         internal protected Connection(WebSocket socket, IReadOnlyDictionary<string, string> cookies)
         {
             this.socket = socket;
@@ -105,7 +105,7 @@ namespace WebSocketRPC
         #region Events
 
         /// <summary>
-        /// Message receive event. Message is decoded using <seealso cref="Encoding"/>.
+        /// Message receive event. Message is decoded using <seealso cref="Encoding"/> (args: message).
         /// </summary>
         public event Func<string, Task> OnReceive;
         /// <summary>
@@ -113,11 +113,11 @@ namespace WebSocketRPC
         /// </summary>
         public event Func<Task> OnOpen;
         /// <summary>
-        /// Close event.
+        /// Close event (args: close status, close description).
         /// </summary>
         public event Func<WebSocketCloseStatus, string, Task> OnClose;
         /// <summary>
-        /// Error event Args: exception.
+        /// Error event (args: exception).
         /// </summary>
         public event Func<Exception, Task> OnError;
 
@@ -198,6 +198,7 @@ namespace WebSocketRPC
 
         /// <summary>
         /// Sends the specified data as the text message type.
+        /// <para>The message is encoded using <see cref="Encoding"/> encoding.</para>
         /// </summary>
         /// <param name="data">Text data to send.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
@@ -251,6 +252,9 @@ namespace WebSocketRPC
         /// <returns>Task.</returns>
         public async Task CloseAsync(WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure, string statusDescription = "")
         {
+            if (statusDescription == null)
+                throw new ArgumentNullException(nameof(statusDescription), "The value may be empty but not null.");
+
             try
             {
                 if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
@@ -279,10 +283,10 @@ namespace WebSocketRPC
         #region Receive (listen)
 
         /// <summary>
-        /// Listens for the receive messages for the specified connection.
+        /// Listens for the incoming messages.
         /// </summary>
         /// <param name="token">Cancellation token.</param>
-        /// <returns>Task.</returns>
+        /// <returns>Listening task.</returns>
         internal async Task ListenReceiveAsync(CancellationToken token)
         {
             using (var registration = token.Register(() => CloseAsync().Wait()))

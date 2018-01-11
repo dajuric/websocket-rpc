@@ -38,7 +38,7 @@ namespace WebSocketRPC
         /// <summary>
         /// Creates and starts a new websocket listening client.
         /// </summary>
-        /// <param name="uri">The target uri of the format: "ws://(address)/[path]".</param>
+        /// <param name="uri">The target URI of the format: "ws://(address)/[path]".</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is established.</param>
         /// <param name="reconnectOnError">True to reconnect on error, false otherwise.

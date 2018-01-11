@@ -32,12 +32,12 @@ using System.Text;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// Contains function related to Javascript RPC.
+    /// Contains functions for creating RPC JavaScript API from a provided class/interface.
     /// </summary>
     public static class RPCJs
     {
         /// <summary>
-        /// Generates Javascript code from the provided class or interface type.
+        /// Generates JavaScript code from the provided class or interface type.
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
         /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
@@ -65,10 +65,10 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Generates Javascript code including JsDoc comments from the provided class or interface type.
+        /// Generates JavaScript code including JsDoc comments from the provided class or interface type.
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
-        /// <param name="xmlDocPath">Xml assembly definition file.</param>
+        /// <param name="xmlDocPath">XML assembly definition file.</param>
         /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
         /// <returns>Javascript API.</returns>
         public static string GenerateCallerWithDoc<T>(string xmlDocPath, RPCJsSettings<T> settings = null)
@@ -99,8 +99,8 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Generates Javascript code including JsDoc comments from the provided class or interface type.
-        /// <para>The xml assembly definition is taken form the executing assembly if available.</para>
+        /// Generates JavaScript code including JsDoc comments from the provided class or interface type.
+        /// <para>The XML assembly definition is taken form the executing assembly if available.</para>
         /// </summary>
         /// <typeparam name="T">Class or interface type.</typeparam>
         /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>

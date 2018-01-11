@@ -41,13 +41,13 @@ namespace WebSocketRPC
     public static class Server
     {
         /// <summary>
-        /// Creates and starts a new instance of the http(s) / websocket server.
+        /// Creates and starts a new instance of the HTTP(s) / WebSocket server.
         /// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
-        /// <param name="port">The http/https URI listening port.</param>
+        /// <param name="port">The HTTP(s) URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
+        /// <param name="useHttps">True to add 'https://' prefix instead of 'http://'.</param>
         /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(int port, CancellationToken token, Action<Connection, WebSocketContext> onConnect, bool useHttps = false)
         {
@@ -59,13 +59,12 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Creates and starts a new instance of the http / websocket server.
-        /// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
+        /// Creates and starts a new instance of the HTTP(s) / WebSocket server.
         /// </summary>
-        /// <param name="port">The http/https URI listening port.</param>
+        /// <param name="port">The HTTP(s) URI listening port.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
+        /// <param name="onHttpRequestAsync">Action executed on each HTTP(s) request.</param>
         /// <param name="useHttps">True to add 'https://' prefix insteaad of 'http://'.</param>
         /// <param name="maxHttpConnectionCount">Maximum HTTP connection count, after which the incoming requests will wait.</param>
         /// <returns>Server listening task.</returns>
@@ -81,10 +80,10 @@ namespace WebSocketRPC
 
 
         /// <summary>
-        /// Creates and starts a new instance of the http / websocket server.
-		/// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
+        /// Creates and starts a new instance of the HTTP(s) / WebSocket server.
+        /// <para>All HTTP requests will have the 'BadRequest' response by default.</para>
         /// </summary>
-        /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
+        /// <param name="httpListenerPrefix">The HTTP(s) URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
         /// <returns>Server listening task.</returns>
@@ -98,12 +97,12 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Creates and starts a new instance of the http / websocket server.
+        /// Creates and starts a new instance of the HTTP(s) / WebSocket server.
         /// </summary>
-        /// <param name="httpListenerPrefix">The http/https URI listening prefix.</param>
+        /// <param name="httpListenerPrefix">The HTTP(s) URI listening prefix.</param>
         /// <param name="token">Cancellation token.</param>
         /// <param name="onConnect">Action executed when connection is created.</param>
-        /// <param name="onHttpRequestAsync">Action executed on HTTP request.</param>
+        /// <param name="onHttpRequestAsync">Action executed on each HTTP(s) request.</param>
         /// <param name="maxHttpConnectionCount">Maximum HTTP connection count, after which the incoming requests will wait.</param>
         /// <returns>Server listening task.</returns>
         public static async Task ListenAsync(string httpListenerPrefix, CancellationToken token, Action<Connection, WebSocketContext> onConnect, Func<HttpListenerRequest, HttpListenerResponse, Task> onHttpRequestAsync, byte maxHttpConnectionCount = 32)

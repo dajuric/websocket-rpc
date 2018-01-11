@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace WebSocketRPC
 {
     /// <summary>
-    /// WebSocket RPC middle-ware.
+    /// WebSocket RPC middle-ware class.
     /// </summary>
     public class WebSocketRPCMiddleware
     {
@@ -28,10 +28,10 @@ namespace WebSocketRPC
         }
 
         /// <summary>
-        /// Invokes the web-socket listener.
+        /// Invokes RPC listening task for the underlying WebSocket.
         /// </summary>
         /// <param name="context">HTTP context.</param>
-        /// <returns>Listener task.</returns>
+        /// <returns>Listening task.</returns>
         public async Task Invoke(HttpContext context)
         {
             if (!context.WebSockets.IsWebSocketRequest)
