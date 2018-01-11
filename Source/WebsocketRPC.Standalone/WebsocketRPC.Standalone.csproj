@@ -21,16 +21,16 @@
   <!-- NuGet -->
   <PropertyGroup>
     <Authors>Darko Jurić</Authors>
-    <Description>Provides full duplex RPC over websocket.</Description>
+    <Description>Cross platform RPCs over WebSocket.</Description>
     <Copyright>Darko Jurić</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</PackageIconUrl>
-    <PackageProjectUrl>http://websocket-rpc.net/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/dajuric/websocket-rpc/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dajuric/websocket-rpc/</RepositoryUrl>
     <PackageTags>websocket; websocket-client; websocket-server; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Version>1.0.1</Version>
+    <Version>1.0.5</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
 
     <IncludeSource>True</IncludeSource>
