@@ -9,7 +9,7 @@
 </p>
 
 **WebSokcetRPC** - RPC over websocket for .NET    
-Lightweight .NET framework for making RPC over websockets. Supports full duplex connections; .NET or Javascript clients. 
+WebSocket RPC library for .NET with auto JavaScript client code generation, supporting ASP.NET Core.
 
  > **Tutorial:** <a href="https://www.codeproject.com/Articles/1210957/Introducing-Lightweight-WebSocket-RPC-Library-for" target="_blank">CodeProject article</a>
 
