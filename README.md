@@ -8,7 +8,7 @@
     <a href="https://www.nuget.org/packages/WebsocketRPC.AspCore/"> <img src="https://img.shields.io/badge/WebSokcetRPC.AspCore-v1.x-blue.svg?style=flat-square" alt="NuGet packages version"/>  </a>
 </p>
 
-**WebSokcetRPC** - RPC over websocket for .NET    
+**WebSokcetRPC** - RPC over WebSocket for .NET    
 WebSocket RPC library for .NET with auto JavaScript client code generation, supporting ASP.NET Core.
 
  > **Tutorial:** <a href="https://www.codeproject.com/Articles/1210957/Introducing-Lightweight-WebSocket-RPC-Library-for" target="_blank">CodeProject article</a>
