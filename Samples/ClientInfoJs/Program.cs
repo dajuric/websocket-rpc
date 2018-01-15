@@ -13,7 +13,7 @@ namespace ClientInfoJs
     {
         internal async Task InitializeAsync()
         {
-            var browserInfo = await RPC.For<IBrowserInfo>(this)
+            var browserInfo = await RPC.For<IBrowserInfo>(this)            //'this' selects only the associated remote API
                                        .CallAsync(x => x.GetBrowserInfo());
 
             Console.WriteLine("\nBrowser info: " + browserInfo.First());
