@@ -28,7 +28,7 @@
     <PackageTags>websocket; websocket-client; Javascript; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
     <RootNamespace>WebSocketRPC</RootNamespace>
     

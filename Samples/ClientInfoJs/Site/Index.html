@@ -1,0 +1,33 @@
+﻿<html>
+    <head>
+        <title>Client JS</title>
+        <script src="PlatformInfo.js"></script>
+    </head>
+
+    <body>
+        <p id="msg"></p>
+
+        <script>
+            function writeMsg(msg, color)
+            {
+                color = color || 'black';
+
+                var p = document.getElementById("msg");
+                p.innerHTML = JSON.stringify(msg, null, "\t");
+                p.style.color = color;
+            }
+
+            //init API
+            var api = new PlatformInfo("ws://localhost:8001");
+
+            //implement the interface
+            api.getBrowserInfo = () => navigator.userAgent;
+
+            //connect
+            api.connect(() => writeMsg("Connecton established.", 'green'),
+                        err => writeMsg(err, 'red'),
+                        msg => writeMsg(msg));
+        </script>
+
+    </body>
+</html>

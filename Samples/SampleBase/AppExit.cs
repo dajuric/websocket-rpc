@@ -16,7 +16,7 @@ namespace SampleBase
 
             Task.Run(() =>
             {
-                Console.WriteLine("------Press [Enter] or [Ctrl+C] to stop------");
+                Console.WriteLine("------Press [Enter] to stop------");
                 Console.ReadLine();
 
                 cancelTasks(cts);

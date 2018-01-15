@@ -41,7 +41,7 @@ function onCallRequest(data, onError)
     }
 
     var r = null, errMsg = null;
-    try { obj[jsonFName].apply(obj, data.Arguments); }
+    try { r = obj[jsonFName].apply(obj, data.Arguments); }
     catch (e) { errMsg = e; }
 
     if (r === null || r === undefined) r = true;

@@ -26,6 +26,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -42,14 +43,14 @@ namespace WebSocketRPC
         /// <typeparam name="T">Class or interface type.</typeparam>
         /// <param name="settings">RPC-Js settings used for Javascript code generation.</param>
         /// <returns>Javascript API.</returns>
-        public static string GenerateCaller<T>(RPCJsSettings<T> settings =  null)
+        public static string GenerateCaller<T>(RPCJsSettings<T> settings = null)
         {
             settings = settings ?? new RPCJsSettings<T>();
             var (tName, mInfos) = JsCallerGenerator.GetMethods(settings.OmittedMethods);
             tName = settings.NameOverwrite ?? tName;
 
             var sb = new StringBuilder();
-            if(settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
+            if (settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
             sb.Append(JsCallerGenerator.GenerateHeader(tName));
 
             foreach (var m in mInfos)
