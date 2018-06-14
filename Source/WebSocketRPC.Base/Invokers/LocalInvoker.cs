@@ -57,8 +57,9 @@ namespace WebSocketRPC
         static void verifyType(MethodInfo[] methodList)
         {
             //check constraints
-            if (typeof(TObj).IsInterface)
-                throw new Exception("The specified type must be a class or struct.");
+            //I don't see any reason as to why interfaces should not be allowed
+            //if (typeof(TObj).IsInterface)
+            //    throw new Exception("The specified type must be a class or struct.");
 
             var overloadedMethodNames = methodList.GroupBy(x => x.Name)
                                                   .DefaultIfEmpty()
