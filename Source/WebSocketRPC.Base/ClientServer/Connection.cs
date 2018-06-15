@@ -167,9 +167,14 @@ namespace WebSocketRPC
             {
                 var members = OnReceive.GetInvocationList().Cast<Func<string, Task>>();
 
-                Task.WhenAll(members.Select(x => x(msg)))
-                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
-                    //.Wait(0); //throws TaskCanceledException -> why ?
+                var list = members.Select(x => x(msg)).ToList();
+                var tsk = Task.WhenAll(list);
+                tsk.Wait();
+
+                if (!list.Where(t => !t.IsFaulted).Any())
+                {
+                    InvokeOnError(tsk.Exception);
+                }                                
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
