@@ -36,14 +36,10 @@ namespace WebSocketRPC
 {
     class LocalInvoker<TObj>
     {
-        static Dictionary<Type, NameInfoPairs> cache = new Dictionary<Type, NameInfoPairs>();
-        NameInfoPairs methods;
+        static NameInfoPairs methods;
 
-        public LocalInvoker()
+        static LocalInvoker()
         {
-            lock(cache) cache.TryGetValue(typeof(TObj), out methods);
-            if (methods != null) return;
-
             var methodList = typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
             //check constrains
@@ -51,7 +47,6 @@ namespace WebSocketRPC
 
             //initialize and cache it
             methods = methodList.ToDictionary(x => x.Name, x => x);
-            lock(cache) cache[typeof(TObj)] = methods;
         }
 
         static void verifyType(MethodInfo[] methodList)
