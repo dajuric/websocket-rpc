@@ -217,8 +217,9 @@ namespace WebSocketRPC
                 values.Add(value);
             }
 
-            var fName = ((MethodCallExpression)expression.Body).Method.Name;
-            return (fName, values.ToArray());
+            var fName = call.Method.Name;
+            
+            return ($"{typeof(T).FullName}.{fName}", values.ToArray());
         }
 
         #endregion

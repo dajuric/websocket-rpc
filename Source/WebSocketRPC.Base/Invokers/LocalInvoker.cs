@@ -95,7 +95,12 @@ namespace WebSocketRPC
 
         async Task<JToken> invokeAsync(TObj obj, string functionName, JToken[] args)
         {
-            if (!methods.ContainsKey(functionName))
+            var (iface, name) = parseFunctionName(functionName);
+            functionName = name;
+
+            bool ifacematch = iface == null || iface == typeof(TObj).FullName;
+
+            if (!ifacematch || !methods.ContainsKey(functionName))
                 throw new ArgumentException(functionName + ": The object does not contain the provided method name: " + functionName + ".");
 
             var methodParams = methods[functionName].GetParameters();
@@ -123,6 +128,17 @@ namespace WebSocketRPC
             }
 
             return result;
+        }
+
+        private (string iface, string name) parseFunctionName(string functionName)
+        {
+            int index = functionName.LastIndexOf('.');
+            if (index == -1)
+                return (null, functionName);
+
+            var iface = functionName.Substring(0, index);
+            var name = functionName.Substring(index + 1, functionName.Length - index - 1);
+            return (iface, name);            
         }
 
         async Task invokeAsync(MethodInfo method, TObj obj, object[] args)
