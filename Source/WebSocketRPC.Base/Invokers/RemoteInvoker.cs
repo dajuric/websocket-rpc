@@ -218,8 +218,9 @@ namespace WebSocketRPC
             }
 
             var fName = call.Method.Name;
+            var type = typeof(T).GetGenericArguments()[0]; // The Expression contains a lambda, therefore the first argument is the type we call it on.
             
-            return ($"{typeof(T).FullName}.{fName}", values.ToArray());
+            return ($"{type.FullName}.{fName}", values.ToArray());
         }
 
         #endregion
