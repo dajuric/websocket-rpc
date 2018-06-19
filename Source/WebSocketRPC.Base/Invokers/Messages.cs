@@ -30,7 +30,7 @@ using System.Linq;
 
 namespace WebSocketRPC
 {
-    struct Request
+    public class Request
     {
         public string FunctionName;
         public string CallId;
@@ -73,7 +73,7 @@ namespace WebSocketRPC
         public bool IsEmpty => FunctionName == null && Arguments == null;
     }
 
-    struct Response
+    public struct Response
     {
         public string FunctionName;
         public string CallId;

@@ -79,6 +79,7 @@ namespace WebSocketRPC
 
         WebSocket socket;
         TaskQueue sendTaskQueue;
+        List<ILocalBinder> localBinders = new List<ILocalBinder>();
 
         /// <summary>
         /// Creates a new connection.
@@ -90,6 +91,11 @@ namespace WebSocketRPC
             this.socket = socket;
             this.sendTaskQueue = new TaskQueue();
             this.Cookies = cookies;
+        }
+
+        internal void AddLocalBinder(ILocalBinder binder)
+        {
+            localBinders.Add(binder);
         }
 
         /// <summary>
@@ -168,13 +174,13 @@ namespace WebSocketRPC
                 var members = OnReceive.GetInvocationList().Cast<Func<string, Task>>();
 
                 var list = members.Select(x => x(msg)).ToList();
-                var tsk = Task.WhenAll(list);
-                tsk.Wait();
+                Task.WaitAll(list.ToArray());
 
-                if (!list.Where(t => !t.IsFaulted).Any())
+                bool allFaulted = !list.Where(t => !t.IsFaulted).Any();
+                if (allFaulted)
                 {
-                    InvokeOnError(tsk.Exception);
-                }                                
+                    InvokeOnError(list[0].Exception);
+                }                
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
@@ -347,8 +353,7 @@ namespace WebSocketRPC
                     default:
                         var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
                         var msg = segment.ToString(encoding);
-
-                        invokeOnReceive(msg);
+                        processMessage(msg);
                         Debug.WriteLine("Received: " + msg);
                         break;
                 }
@@ -356,6 +361,32 @@ namespace WebSocketRPC
                 //check if cancellation is requested
                 if (token.IsCancellationRequested)
                     break;
+            }
+        }
+
+        private async void processMessage(string msg)
+        {
+            try
+            {
+                Request request = Request.FromJson(msg);
+
+                var binder = localBinders.Where(b => b.CanProcessRequest(request)).FirstOrDefault();
+                Response response = new Response();
+                if (binder == null)
+                {
+                    response.CallId = request.CallId;
+                    response.FunctionName = request.FunctionName;
+                    response.Error = $"Function not resolved: {response.FunctionName}";
+                }
+                else
+                {
+                    await binder.InvokeRequest(request);
+                }
+                invokeOnReceive(msg);
+                await SendAsync(response.ToJson());
+            }
+            catch(Exception) //TODO:
+            {
             }
         }
 

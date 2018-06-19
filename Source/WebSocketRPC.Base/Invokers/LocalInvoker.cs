@@ -69,6 +69,24 @@ namespace WebSocketRPC
                 throw new NotSupportedException("Properties are not permitted: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
         }
 
+        public bool CanInvoke(Request clientMessage)
+        {
+            var functionName = clientMessage.FunctionName;
+            var (iface, name) = parseFunctionName(functionName);
+            functionName = name;
+
+            bool ifacematch = iface == null || iface == typeof(TObj).FullName;
+
+            if (!ifacematch || !methods.ContainsKey(functionName))
+                return false;
+
+            var methodParams = methods[functionName].GetParameters();
+            if (methodParams.Length != clientMessage.Arguments.Length)
+                return false;
+
+            return true;
+        }
+
         public async Task<Response> InvokeAsync(TObj obj, Request clientMessage)
         {
             JToken result = null;

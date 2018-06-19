@@ -12,19 +12,39 @@ namespace WebSocketRPC
         /// <summary>
         /// Gets the associated connection.
         /// </summary>
-        Connection Connection { get; }
+        Connection Connection { get; }        
+    }
+
+    /// <summary>
+    /// The base local binder.
+    /// </summary>
+    public interface ILocalBinder : IBinder
+    {
+        /// <summary>
+        /// Checks whether the provided request can be processed by this IBinder.
+        /// </summary>
+        /// <param name="request">The request being checked.</param>
+        /// <returns>True if this binder can invoke a method for this request; false otherwise.</returns>
+        bool CanProcessRequest(Request request);
+
+        /// <summary>
+        /// Invoke a request.
+        /// </summary>
+        /// <param name="request">The invoked request.</param>
+        /// <returns>The response for the given request.</returns>
+        Task<Response> InvokeRequest(Request request);
     }
 
     /// <summary>
     /// Interface for a local binder for the specified object type.
     /// </summary>
     /// <typeparam name="TObj">Object type.</typeparam>
-    public interface ILocalBinder<TObj> : IBinder
+    public interface ILocalBinder<TObj> : ILocalBinder
     {
         /// <summary>
         /// Gets the associated object.
         /// </summary>
-        TObj Object { get; }
+        TObj Object { get; }        
     }
 
     /// <summary>
