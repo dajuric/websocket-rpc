@@ -368,7 +368,10 @@ namespace WebSocketRPC
         {
             try
             {
+                invokeOnReceive(msg);
                 Request request = Request.FromJson(msg);
+                if (request.IsEmpty)
+                    return;
 
                 var binder = localBinders.Where(b => b.CanProcessRequest(request)).FirstOrDefault();
                 Response response = new Response();
@@ -380,9 +383,8 @@ namespace WebSocketRPC
                 }
                 else
                 {
-                    await binder.InvokeRequest(request);
-                }
-                invokeOnReceive(msg);
+                    response = await binder.InvokeRequest(request);
+                }                
                 await SendAsync(response.ToJson());
             }
             catch(Exception) //TODO:

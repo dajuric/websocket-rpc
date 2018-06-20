@@ -30,12 +30,13 @@
     <PackageTags>websocket; websocket-client; websocket-server; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Version>1.1.3</Version>
+    <Version>1.2.0</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
 
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageId>RoboRoboRally.WebsocketRPC.Standalone</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <Import Project="..\WebSocketRPC.Base\WebSocketRPC.Base.projitems" Label="Shared" />
   

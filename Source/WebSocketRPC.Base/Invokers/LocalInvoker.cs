@@ -40,7 +40,12 @@ namespace WebSocketRPC
 
         static LocalInvoker()
         {
-            var methodList = typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            List<MethodInfo> methodList = new List<MethodInfo>();
+            methodList.AddRange(typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            if (typeof(TObj).IsInterface)
+            {                
+                methodList.AddRange(typeof(TObj).GetInterfaces().SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance)));
+            }
 
             //check constrains
             verifyType(methodList);
@@ -49,7 +54,7 @@ namespace WebSocketRPC
             methods = methodList.ToDictionary(x => x.Name, x => x);
         }
 
-        static void verifyType(MethodInfo[] methodList)
+        static void verifyType(IEnumerable<MethodInfo> methodList)
         {
             //check constraints
             //I don't see any reason as to why interfaces should not be allowed
@@ -75,9 +80,7 @@ namespace WebSocketRPC
             var (iface, name) = parseFunctionName(functionName);
             functionName = name;
 
-            bool ifacematch = iface == null || iface == typeof(TObj).FullName;
-
-            if (!ifacematch || !methods.ContainsKey(functionName))
+            if (!interfaceMatches(iface) || !methods.ContainsKey(functionName))
                 return false;
 
             var methodParams = methods[functionName].GetParameters();
@@ -85,6 +88,25 @@ namespace WebSocketRPC
                 return false;
 
             return true;
+        }
+
+        private bool interfaceMatches(string interfaceName)
+        {
+            if (interfaceName == null)
+                return true;
+
+            if (typeof(TObj).GetInterfaces().Where(t => t.FullName == interfaceName).Any())
+                return true;
+
+            Type type = typeof(TObj);
+            while (type != null)
+            {
+                if (type.FullName == interfaceName)
+                    return true;
+                type = type.BaseType;
+            }
+
+            return false;
         }
 
         public async Task<Response> InvokeAsync(TObj obj, Request clientMessage)
@@ -116,9 +138,7 @@ namespace WebSocketRPC
             var (iface, name) = parseFunctionName(functionName);
             functionName = name;
 
-            bool ifacematch = iface == null || iface == typeof(TObj).FullName;
-
-            if (!ifacematch || !methods.ContainsKey(functionName))
+            if (!interfaceMatches(iface) || !methods.ContainsKey(functionName))
                 throw new ArgumentException(functionName + ": The object does not contain the provided method name: " + functionName + ".");
 
             var methodParams = methods[functionName].GetParameters();
