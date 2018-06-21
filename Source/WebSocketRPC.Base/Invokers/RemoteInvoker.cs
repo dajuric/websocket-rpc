@@ -32,6 +32,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Net.WebSockets;
 
 namespace WebSocketRPC
 {
@@ -62,6 +63,11 @@ namespace WebSocketRPC
             public void SetResult(Response result)
             {
                 completionSource.SetResult(result);
+            }
+
+            public void SetException(Exception exception)
+            {
+                completionSource.SetException(exception);
             }
 
             public void Dispose()
@@ -120,6 +126,18 @@ namespace WebSocketRPC
             {
                 if (runningMethods.ContainsKey(key))
                     runningMethods[key].SetResult(response);
+            }
+        }
+
+        public void Close(WebSocketCloseStatus status, string description)
+        {
+            lock(runningMethods)
+            {
+                foreach(var pair in runningMethods)
+                {
+                    pair.Value.SetException(new WebSocketException($"Web socket closed: {status} - {description}"));
+                }
+                runningMethods.Clear();
             }
         }
 
