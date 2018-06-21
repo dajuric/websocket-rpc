@@ -265,7 +265,7 @@ namespace WebSocketRPC
         {
             if (statusDescription == null)
                 throw new ArgumentNullException(nameof(statusDescription), "The value may be empty but not null.");
-
+           
             try
             {
                 if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
@@ -305,6 +305,7 @@ namespace WebSocketRPC
                 try
                 {
                     await listenReceiveAsync(token);
+                    await CloseAsync(WebSocketCloseStatus.NormalClosure);
                 }
                 catch (Exception ex)
                 {

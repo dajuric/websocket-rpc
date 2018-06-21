@@ -30,7 +30,7 @@
     <PackageTags>websocket; websocket-client; websocket-server; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
 
     <IncludeSource>True</IncludeSource>
