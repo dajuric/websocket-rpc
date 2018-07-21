@@ -196,7 +196,7 @@ namespace WebSocketRPC
             {
                 FunctionName = name,
                 CallId = Guid.NewGuid().ToString(),
-                Arguments = args.Select(a => JToken.FromObject(a, RPC.Serializer)).ToArray()
+                Arguments = args.Select(a => a == null ? JValue.CreateNull() : JToken.FromObject(a, RPC.Serializer)).ToArray()
             };
 
             var key = msg.FunctionName + "-" + msg.CallId;

@@ -183,8 +183,11 @@ namespace WebSocketRPC
         {
             object returnVal = method.Invoke(obj, args);
 
+            //bool isTask = returnVal != null && returnVal is Task;
+            bool isAsync = method.GetCustomAttribute<AsyncStateMachineAttribute>() != null;
+
             //async method support
-            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+            if (isAsync)
             {
                 var task = (Task)returnVal;
                 await task.ConfigureAwait(false);
@@ -195,19 +198,20 @@ namespace WebSocketRPC
         {
             object returnVal = method.Invoke(obj, args);
 
+            bool isAsync = method.GetCustomAttribute<AsyncStateMachineAttribute>() != null;
+            bool isTask = returnVal is Task;
+
             //async method support
-            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+            if (isAsync || isTask)
             {
                 var task = (Task)returnVal;
                 await task.ConfigureAwait(false);
-
+                
                 var resultProperty = task.GetType().GetProperty("Result");
                 returnVal = resultProperty.GetValue(task);
             }
 
             return returnVal;
         }
-
-
     }
 }

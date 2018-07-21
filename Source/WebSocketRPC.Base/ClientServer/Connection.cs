@@ -369,6 +369,7 @@ namespace WebSocketRPC
         {
             try
             {
+                await Task.CompletedTask;
                 invokeOnReceive(msg);
                 Request request = Request.FromJson(msg);
                 if (request.IsEmpty)
