@@ -41,8 +41,7 @@ namespace AspRpc
 
             //initialize web-sockets and bind the service
             reportingService = new ReportingService();
-            app.UseWebSockets();
-            app.MapWebSocketRPC("/reportingService", (hc, c) => c.Bind<ReportingService, IClientUpdate>(reportingService));
+            app.UseWebSocketRPC(new WebSocketRPCOptions("/reportingService", (hc, c) => c.Bind<ReportingService, IClientUpdate>(reportingService)));
         }
     }
 
