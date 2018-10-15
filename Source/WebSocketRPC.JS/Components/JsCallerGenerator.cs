@@ -66,6 +66,11 @@ namespace WebSocketRPC
             return (objType.Name, methodList);
         }
 
+        public static string GenerateCommonJsHeader(string className)
+        {
+            return $"module.exports = ";
+        }
+
         public static string GenerateRequireJsHeader(string className)
         {
             var t = new string[] {

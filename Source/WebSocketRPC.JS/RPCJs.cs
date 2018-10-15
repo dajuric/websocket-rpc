@@ -50,7 +50,17 @@ namespace WebSocketRPC
             tName = settings.NameOverwrite ?? tName;
 
             var sb = new StringBuilder();
-            if (settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
+
+            switch(settings.Format)
+            {
+                case RPCJsSettings<T>.Module.RequireJS:
+                    sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
+                    break;
+                case RPCJsSettings<T>.Module.CommonJS:
+                    sb.Append(JsCallerGenerator.GenerateCommonJsHeader(tName));
+                    break;
+            }
+
             sb.Append(JsCallerGenerator.GenerateHeader(tName));
 
             foreach (var m in mInfos)
@@ -81,7 +91,17 @@ namespace WebSocketRPC
             var xmlMemberNodes = JsDocGenerator.GetMemberNodes(xmlDocPath);
 
             var sb = new StringBuilder();
-            if (settings.WithRequireSupport) sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
+
+            switch (settings.Format)
+            {
+                case RPCJsSettings<T>.Module.RequireJS:
+                    sb.Append(JsCallerGenerator.GenerateRequireJsHeader(tName));
+                    break;
+                case RPCJsSettings<T>.Module.CommonJS:
+                    sb.Append(JsCallerGenerator.GenerateCommonJsHeader(tName));
+                    break;
+            }
+
             sb.Append(JsDocGenerator.GetClassDoc(xmlMemberNodes, tName));
             sb.Append(JsCallerGenerator.GenerateHeader(tName));
 
