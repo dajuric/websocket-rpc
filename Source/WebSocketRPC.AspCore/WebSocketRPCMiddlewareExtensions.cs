@@ -7,7 +7,7 @@ namespace WebSocketRPC
     /// <summary>
     /// WebSocket RPC middle-ware extensions.
     /// </summary>
-    public static class WebSokcetRPCMiddlewareExtensions
+    public static class WebSocketRPCMiddlewareExtensions
     {
         /// <summary>
         /// Branches the request pipeline based on matches of the given request path. If  the request path starts with the given path, the branch is executed.
