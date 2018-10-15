@@ -20,8 +20,7 @@ namespace WebSocketRPC
         /// </summary>
         /// <param name="next">Next middle-ware in the pipeline.</param>
         /// <param name="onConnect">Action triggered when a new connection is received.</param>
-        public WebSocketRPCMiddleware(RequestDelegate next,
-                                      Action<HttpContext, Connection> onConnect)
+        public WebSocketRPCMiddleware(RequestDelegate next, Action<HttpContext, Connection> onConnect)
         {
             this.next = next;
             this.onConnect = onConnect;
