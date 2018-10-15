@@ -36,29 +36,30 @@ namespace WebSocketRPC
 {
     class LocalInvoker<TObj>
     {
-        static Dictionary<Type, NameInfoPairs> cache = new Dictionary<Type, NameInfoPairs>();
-        NameInfoPairs methods;
+        static NameInfoPairs methods;
 
-        public LocalInvoker()
+        static LocalInvoker()
         {
-            lock(cache) cache.TryGetValue(typeof(TObj), out methods);
-            if (methods != null) return;
-
-            var methodList = typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            List<MethodInfo> methodList = new List<MethodInfo>();
+            methodList.AddRange(typeof(TObj).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            if (typeof(TObj).IsInterface)
+            {                
+                methodList.AddRange(typeof(TObj).GetInterfaces().SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance)));
+            }
 
             //check constrains
             verifyType(methodList);
 
             //initialize and cache it
             methods = methodList.ToDictionary(x => x.Name, x => x);
-            lock(cache) cache[typeof(TObj)] = methods;
         }
 
-        static void verifyType(MethodInfo[] methodList)
+        static void verifyType(IEnumerable<MethodInfo> methodList)
         {
             //check constraints
-            if (typeof(TObj).IsInterface)
-                throw new Exception("The specified type must be a class or struct.");
+            //I don't see any reason as to why interfaces should not be allowed
+            //if (typeof(TObj).IsInterface)
+            //    throw new Exception("The specified type must be a class or struct.");
 
             var overloadedMethodNames = methodList.GroupBy(x => x.Name)
                                                   .DefaultIfEmpty()
@@ -71,6 +72,41 @@ namespace WebSocketRPC
             var propertyList = typeof(TObj).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             if (propertyList.Any())
                 throw new NotSupportedException("Properties are not permitted: " + String.Join(", ", propertyList.Select(x => x.Name)) + ".");
+        }
+
+        public bool CanInvoke(Request clientMessage)
+        {
+            var functionName = clientMessage.FunctionName;
+            var (iface, name) = parseFunctionName(functionName);
+            functionName = name;
+
+            if (!interfaceMatches(iface) || !methods.ContainsKey(functionName))
+                return false;
+
+            var methodParams = methods[functionName].GetParameters();
+            if (methodParams.Length != clientMessage.Arguments.Length)
+                return false;
+
+            return true;
+        }
+
+        private bool interfaceMatches(string interfaceName)
+        {
+            if (interfaceName == null)
+                return true;
+
+            if (typeof(TObj).GetInterfaces().Where(t => t.FullName == interfaceName).Any())
+                return true;
+
+            Type type = typeof(TObj);
+            while (type != null)
+            {
+                if (type.FullName == interfaceName)
+                    return true;
+                type = type.BaseType;
+            }
+
+            return false;
         }
 
         public async Task<Response> InvokeAsync(TObj obj, Request clientMessage)
@@ -99,7 +135,10 @@ namespace WebSocketRPC
 
         async Task<JToken> invokeAsync(TObj obj, string functionName, JToken[] args)
         {
-            if (!methods.ContainsKey(functionName))
+            var (iface, name) = parseFunctionName(functionName);
+            functionName = name;
+
+            if (!interfaceMatches(iface) || !methods.ContainsKey(functionName))
                 throw new ArgumentException(functionName + ": The object does not contain the provided method name: " + functionName + ".");
 
             var methodParams = methods[functionName].GetParameters();
@@ -129,12 +168,26 @@ namespace WebSocketRPC
             return result;
         }
 
+        private (string iface, string name) parseFunctionName(string functionName)
+        {
+            int index = functionName.LastIndexOf('.');
+            if (index == -1)
+                return (null, functionName);
+
+            var iface = functionName.Substring(0, index);
+            var name = functionName.Substring(index + 1, functionName.Length - index - 1);
+            return (iface, name);            
+        }
+
         async Task invokeAsync(MethodInfo method, TObj obj, object[] args)
         {
             object returnVal = method.Invoke(obj, args);
 
+            //bool isTask = returnVal != null && returnVal is Task;
+            bool isAsync = method.GetCustomAttribute<AsyncStateMachineAttribute>() != null;
+
             //async method support
-            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+            if (isAsync)
             {
                 var task = (Task)returnVal;
                 await task.ConfigureAwait(false);
@@ -145,19 +198,20 @@ namespace WebSocketRPC
         {
             object returnVal = method.Invoke(obj, args);
 
+            bool isAsync = method.GetCustomAttribute<AsyncStateMachineAttribute>() != null;
+            bool isTask = returnVal is Task;
+
             //async method support
-            if (method.GetCustomAttribute<AsyncStateMachineAttribute>() != null)
+            if (isAsync || isTask)
             {
                 var task = (Task)returnVal;
                 await task.ConfigureAwait(false);
-
+                
                 var resultProperty = task.GetType().GetProperty("Result");
                 returnVal = resultProperty.GetValue(task);
             }
 
             return returnVal;
         }
-
-
     }
 }

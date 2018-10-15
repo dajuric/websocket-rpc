@@ -38,14 +38,7 @@ namespace WebSocketRPC
             lInvoker = new LocalInvoker<TObj>();
             Object = obj;
 
-            Connection.OnReceive += async d =>
-            {
-                var msg = Request.FromJson(d);
-                if (msg.IsEmpty) return;
-
-                var result = await lInvoker.InvokeAsync(Object, msg);
-                await Connection.SendAsync(result.ToJson());
-            };
+            Connection.AddLocalBinder(this);
 
             Connection.OnClose += (s, d) =>
             {
@@ -57,5 +50,15 @@ namespace WebSocketRPC
         }
 
         public TObj Object { get; private set; }
+
+        public bool CanProcessRequest(Request request)
+        {
+            return lInvoker.CanInvoke(request);
+        }
+
+        public Task<Response> InvokeRequest(Request request)
+        {
+            return lInvoker.InvokeAsync(Object, request);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
+        <TargetFrameworks>netcoreapp2.0;net47;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
   <PropertyGroup>
@@ -20,21 +20,23 @@
 
   <!-- NuGet -->
   <PropertyGroup>
-    <Authors>Darko Jurić</Authors>
+    <Authors>Darko Jurić, Václav Čamra</Authors>
     <Description>Cross platform RPCs over WebSocket.</Description>
     <Copyright>Darko Jurić</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/dajuric/websocket-rpc/master/Deploy/Logo/Logo-small.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/dajuric/websocket-rpc/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dajuric/websocket-rpc/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/vacamra/websocket-rpc/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vacamra/websocket-rpc/</RepositoryUrl>
     <PackageTags>websocket; websocket-client; websocket-server; RPC; C#; .NET</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Version>1.0.6</Version>
+    <Version>1.2.5</Version>
     <PackageOutputPath>../../Deploy/Nuget/bin/</PackageOutputPath>
 
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
+    <PackageId>RoboRoboRally.WebsocketRPC.Standalone</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <Import Project="..\WebSocketRPC.Base\WebSocketRPC.Base.projitems" Label="Shared" />
   

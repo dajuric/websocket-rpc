@@ -32,6 +32,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Net.WebSockets;
 
 namespace WebSocketRPC
 {
@@ -62,6 +63,11 @@ namespace WebSocketRPC
             public void SetResult(Response result)
             {
                 completionSource.SetResult(result);
+            }
+
+            public void SetException(Exception exception)
+            {
+                completionSource.SetException(exception);
             }
 
             public void Dispose()
@@ -123,6 +129,18 @@ namespace WebSocketRPC
             }
         }
 
+        public void Close(WebSocketCloseStatus status, string description)
+        {
+            lock(runningMethods)
+            {
+                foreach(var pair in runningMethods)
+                {
+                    pair.Value.SetException(new WebSocketException($"Web socket closed: {status} - {description}"));
+                }
+                runningMethods.Clear();
+            }
+        }
+
         public TimeSpan RequestTerminationDelay { get; private set; }
 
         #region Invoke
@@ -178,7 +196,7 @@ namespace WebSocketRPC
             {
                 FunctionName = name,
                 CallId = Guid.NewGuid().ToString(),
-                Arguments = args.Select(a => JToken.FromObject(a, RPC.Serializer)).ToArray()
+                Arguments = args.Select(a => a == null ? JValue.CreateNull() : JToken.FromObject(a, RPC.Serializer)).ToArray()
             };
 
             var key = msg.FunctionName + "-" + msg.CallId;
@@ -217,8 +235,10 @@ namespace WebSocketRPC
                 values.Add(value);
             }
 
-            var fName = ((MethodCallExpression)expression.Body).Method.Name;
-            return (fName, values.ToArray());
+            var fName = call.Method.Name;
+            var type = call.Method.DeclaringType;
+            
+            return ($"{type.FullName}.{fName}", values.ToArray());
         }
 
         #endregion

@@ -79,6 +79,7 @@ namespace WebSocketRPC
 
         WebSocket socket;
         TaskQueue sendTaskQueue;
+        List<ILocalBinder> localBinders = new List<ILocalBinder>();
 
         /// <summary>
         /// Creates a new connection.
@@ -90,6 +91,11 @@ namespace WebSocketRPC
             this.socket = socket;
             this.sendTaskQueue = new TaskQueue();
             this.Cookies = cookies;
+        }
+
+        internal void AddLocalBinder(ILocalBinder binder)
+        {
+            localBinders.Add(binder);
         }
 
         /// <summary>
@@ -167,9 +173,14 @@ namespace WebSocketRPC
             {
                 var members = OnReceive.GetInvocationList().Cast<Func<string, Task>>();
 
-                Task.WhenAll(members.Select(x => x(msg)))
-                    .ContinueWith(t => InvokeOnError(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
-                    //.Wait(0); //throws TaskCanceledException -> why ?
+                var list = members.Select(x => x(msg)).ToList();
+                Task.WaitAll(list.ToArray());
+
+                bool allFaulted = !list.Where(t => !t.IsFaulted).Any();
+                if (allFaulted)
+                {
+                    InvokeOnError(list[0].Exception);
+                }                
             }
             catch (Exception ex) when (ex.InnerException is TaskCanceledException)
             { }
@@ -254,7 +265,7 @@ namespace WebSocketRPC
         {
             if (statusDescription == null)
                 throw new ArgumentNullException(nameof(statusDescription), "The value may be empty but not null.");
-
+           
             try
             {
                 if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
@@ -294,6 +305,7 @@ namespace WebSocketRPC
                 try
                 {
                     await listenReceiveAsync(token);
+                    await CloseAsync(WebSocketCloseStatus.NormalClosure);
                 }
                 catch (Exception ex)
                 {
@@ -342,8 +354,7 @@ namespace WebSocketRPC
                     default:
                         var segment = new ArraySegment<byte>(receiveBuffer, 0, count);
                         var msg = segment.ToString(encoding);
-
-                        invokeOnReceive(msg);
+                        processMessage(msg);
                         Debug.WriteLine("Received: " + msg);
                         break;
                 }
@@ -351,6 +362,35 @@ namespace WebSocketRPC
                 //check if cancellation is requested
                 if (token.IsCancellationRequested)
                     break;
+            }
+        }
+
+        private async void processMessage(string msg)
+        {
+            try
+            {
+                await Task.CompletedTask;
+                invokeOnReceive(msg);
+                Request request = Request.FromJson(msg);
+                if (request.IsEmpty)
+                    return;
+
+                var binder = localBinders.Where(b => b.CanProcessRequest(request)).FirstOrDefault();
+                Response response = new Response();
+                if (binder == null)
+                {
+                    response.CallId = request.CallId;
+                    response.FunctionName = request.FunctionName;
+                    response.Error = $"Function not resolved: {response.FunctionName}";
+                }
+                else
+                {
+                    response = await binder.InvokeRequest(request);
+                }                
+                await SendAsync(response.ToJson());
+            }
+            catch(Exception) //TODO:
+            {
             }
         }
 

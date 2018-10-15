@@ -47,6 +47,12 @@ namespace WebSocketRPC
                 rInvoker.Receive(msg);
                 await Task.FromResult(0);
             };
+
+            Connection.OnClose += (reason, description) =>
+            {
+                rInvoker.Close(reason, description);
+                return Task.CompletedTask;
+            };
         }
 
         public async Task CallAsync(Expression<Action<TInterface>> functionExpression)
