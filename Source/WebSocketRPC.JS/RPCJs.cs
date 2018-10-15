@@ -108,10 +108,7 @@ namespace WebSocketRPC
         /// <returns>Javascript API.</returns>
         public static string GenerateCallerWithDoc<T>(RPCJsSettings<T> settings = null)
         {
-            var assembly = Assembly.GetEntryAssembly();
-            var fInfo = new FileInfo(assembly.Location);
-
-            var xmlDocPath = Path.ChangeExtension(assembly.Location, ".xml");
+            var xmlDocPath = Path.ChangeExtension(typeof(T).Assembly.Location, ".xml");
 
             if (!File.Exists(xmlDocPath))
                 return GenerateCaller(settings);
